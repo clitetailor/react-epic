@@ -1,0 +1,1 @@
+module.export = () => console.log("Hello, World!")
