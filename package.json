@@ -1,7 +1,7 @@
 {
   "name": "react-epic",
   "version": "0.0.1",
-  "description": "Make React components Reactive Again!",
+  "description": "Featured Subscriber and HOC for React Components",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,5 +11,12 @@
     "react"
   ],
   "author": "clitetailor <ducnhatphung@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "hoist-non-react-statics": "^3.0.1",
+    "invariant": "^2.2.4",
+    "prop-types": "^15.6.2",
+    "react": "^16.5.2",
+    "rxjs": "^6.3.2"
+  }
 }
