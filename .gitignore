@@ -1,2 +1,5 @@
+/.cache
+/dist
 /node_modules
+
 shrinkwrap.yaml

@@ -3,7 +3,7 @@ export function bindActions(actions, ...args) {
     Object.keys(actions).reduce(
       (all, name) =>
         Object.assign(all, {
-          [name]: bindActions(actions[name])
+          [name]: bindAction(actions[name])
         }),
       {}
     ),
@@ -12,6 +12,5 @@ export function bindActions(actions, ...args) {
 }
 
 export function bindAction(action) {
-  action.next.bind(action)
-  return action
+  return action.next.bind(action)
 }

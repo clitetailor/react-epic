@@ -7,94 +7,91 @@ import { Subscribe } from './Subscribe'
 const { Provider: ContextProvider, Consumer } = createContext()
 
 export class Provider extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      store: props.store || {}
+  combineEpics(tail, head) {
+    return function(arg) {
+      return tail(head(arg))
     }
   }
 
-  componentDidMount() {
-    this.setState({
-      store: this.props.runEpics.reduce(this.combineEpics)(
-        this.store
-      )
-    })
-  }
-
-  combineEpics = (tail, head) => arg => tail(head(arg))
-
   render() {
-    return createElement(ContextProvider, {
-      value: this.state.store
-    })
+    return createElement(
+      ContextProvider,
+      {
+        /**
+         * This line execution should be pure. Otherwise,
+         * bad things may happen!
+         */
+        value: this.props.runEpics.reduce(this.combineEpics)(
+          this.props.store || {}
+        )
+      },
+      this.props.children
+    )
   }
+}
+
+export function defaultMergeProps(state, props, originalProps) {
+  return Object.assign({}, state, props, originalProps)
 }
 
 export function withRx({
   defaultValue,
+  initialState,
   preload,
   mapStoreToState,
   mapStoreToProps,
-  mergeProps
+  mergeProps = defaultMergeProps
 }) {
   return function wrappedWithRx(WrappedComponent) {
     class RxWrapper extends Component {
       constructor(props) {
         super(props)
 
-        this.propsListener = new Subject()
-
         this.state = {
           childProps: this.props
         }
-      }
 
-      componentDidMount() {
-        this.subscription = this.propsListener.subscribe()
+        this.subscribeFromContext = this.subscribeFromContext.bind(
+          this
+        )
+        this.subscribeFromObserver = this.subscribeFromObserver.bind(
+          this
+        )
       }
 
       render() {
-        return <Consumer>{this.subscribeFromContext}</Consumer>
+        return createElement(
+          Consumer,
+          null,
+          this.subscribeFromContext
+        )
       }
 
-      subscribeFromContext = context => {
+      subscribeFromContext(context) {
         return createElement(
           Subscribe,
           {
-            defaultValue,
+            initialState: defaultValue || initialState,
             preload,
-            observer: combineLatest(
-              mapStoreToState(context),
-              this.propsListener
-            )
+            observer: mapStoreToState(context),
+            args: [context]
           },
           this.subscribeFromObserver
         )
       }
 
-      subscribeFromObserver = ([storeState, props]) =>
-        createElement(
+      subscribeFromObserver(storeState, context) {
+        return createElement(
           WrappedComponent,
           mergeProps(
             storeState,
             mapStoreToProps(context),
-            props
+            this.props
           )
         )
-
-      componentDidUpdate(nextProps) {
-        if (this.props !== nextProps) {
-          this.propsListener.next(nextProps)
-        }
-      }
-
-      componentWillUnmount() {
-        this.subscription.unsubscribe()
       }
     }
 
-    return hoistStatics(RxWrapper, WrappedComponent)
+    return RxWrapper
   }
 }

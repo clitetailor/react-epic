@@ -1,4 +1,5 @@
-import { combineLatest, map } from 'rxjs'
+import { combineLatest } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 export function bindState(states) {
   return combineLatest(
@@ -6,7 +7,7 @@ export function bindState(states) {
      * Actually this line is caculated only once, everytime the context
      * changes. Which mostly occurs only once in our app.
      */
-    Object.keys(states).map(key =>
+    ...Object.keys(states).map(key =>
       states[key].pipe(
         map(
           /**

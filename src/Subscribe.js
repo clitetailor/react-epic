@@ -1,37 +1,34 @@
 import { Component, Children } from 'react'
-import { Subject, combineLatest } from 'rxjs'
+import { Subject } from 'rxjs'
+import { switchMap } from 'rxjs/operators'
 
 export function createSubscribe() {
-  const propTypes = {}
-
   class Subscribe extends Component {
-    constructor(props, context) {
-      super(props, context)
+    constructor(props) {
+      super(props)
 
       this.observerListener = new Subject()
-      this.childrenListener = new Subject()
 
       this.state = {
         loaded: false,
-        children: null
+        childProps:
+          props.defaultValue || props.initialState || {}
       }
+
+      this.onStateChange = this.onStateChange.bind(this)
     }
 
     componentDidMount() {
-      this.subscription = combineLatest(
-        this.observerListener,
-        this.childrenListener
-      )
-        .pipe(switchMap(this.renderChildren))
+      this.subscription = this.observerListener
+        .pipe(switchMap(observer => observer))
         .subscribe(this.onStateChange)
+
+      this.observerListener.next(this.props.observer)
     }
 
-    renderChildren = ([observer, children]) =>
-      observer.pipe(map(props => children(props)))
-
-    onStateChange = children => {
+    onStateChange(childProps) {
       let newState = {
-        children
+        childProps
       }
 
       if (!this.state.loaded) {
@@ -46,16 +43,22 @@ export function createSubscribe() {
      * https://reactjs.org/docs/render-props.html#using-props-other-than-render
      */
     render() {
+      const args = this.props.args || []
       return this.state.loaded
-        ? Children.only(this.state.children)
+        ? this.props.children(
+            this.state.childProps,
+            /**
+             * This actually solve the problem of passing context around.
+             */
+            ...args
+          )
         : this.props.preload
-          ? this.props.preload
-          : Children.only(
-              this.props.children(
-                this.props.defaultValue ||
-                this.props.initialState || // Some people may prefer intialState
-                  {}
-              )
+          ? this.props.preload()
+          : this.props.children(
+              this.props.defaultValue ||
+              this.props.initialState || // Some people may prefer intialState
+                {},
+              ...args
             )
     }
 
@@ -67,10 +70,6 @@ export function createSubscribe() {
          */
         this.observerListener.next(nextProps.observer)
       }
-
-      if (this.props.children !== prevProps.children) {
-        this.childrenListener.next(nextProps.children)
-      }
     }
 
     componentWillUnmount() {
@@ -79,7 +78,6 @@ export function createSubscribe() {
       // Try to clean up
       this.subscription = null
       this.observerListener = null
-      this.childrenListener = null
     }
   }
 
