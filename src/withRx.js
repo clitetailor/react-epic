@@ -1,29 +1,32 @@
 import { Component, createContext, createElement } from 'react'
+import { Subscription } from 'rxjs'
 import hoistStatics from 'hoist-non-react-statics'
 
 import { Subscribe } from './Subscribe'
-import { unsubscribeAll } from './combineEpics'
+import { combineSubscriptions } from './combineSubscriptions'
 
 const { Provider: ContextProvider, Consumer } = createContext()
 
 export class Provider extends Component {
   constructor() {
-    this.subscriptions = []
+    this.subscription = new Subscription()
   }
 
   componentDidMount() {
     if (this.props.runEpic) {
-      this.subscriptions.push(
+      this.subscription.add(
         this.props.runEpic(this.props.store)
       )
     }
 
     if (this.props.runEpics) {
-      this.props.runEpics
-        .map(epic => epic(this.props.store))
-        .forEach(subscription =>
-          this.subscriptions.push(subscription)
+      this.subscription.add(
+        combineSubscriptions(
+          this.props.runEpics.map(epic =>
+            epic(this.props.store)
+          )
         )
+      )
     }
   }
 
@@ -38,7 +41,7 @@ export class Provider extends Component {
   }
 
   componentWillUnmount() {
-    unsubscribeAll(this.subscriptions)
+    this.subscription.unsubscribe()
   }
 }
 

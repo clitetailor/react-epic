@@ -1,4 +1,4 @@
-import { Subscription } from 'rxjs'
+import { combineSubscriptions } from './combineSubscriptions'
 
 /**
  * Combine an object of epics into one subscription. For example:
@@ -13,17 +13,8 @@ import { Subscription } from 'rxjs'
  * ```
  */
 export function combineEpics(epics) {
-  return store => {
-    const subscriptions = Object.keys(epics).map(key =>
-      epics[key](store[key])
+  return store =>
+    combineSubscriptions(
+      Object.keys(epics).map(key => epics[key](store[key]))
     )
-
-    return new Subscription(() => unsubscribeAll(subscriptions))
-  }
-}
-
-export function unsubscribeAll(subscriptions) {
-  subscriptions.forEach(subscription =>
-    subscription.unsubscribe()
-  )
 }
