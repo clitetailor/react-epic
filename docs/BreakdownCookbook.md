@@ -1,8 +1,11 @@
 # React Epic Breakdown Cookbook
 
-Note: The article is long but it's worth to read so enjoy! 🤣
+Note:
 
-To make it can not be simpler, we will come to a basic simple React Counter example app. Imagine we have an app wire frame:
+- The article is long (286 lines exactly) but it's worth to read so enjoy! 🤣
+- These following knowledges come from Haskell community, what i do is just to create this library.
+
+To come to the basic React Epic breakdown, we come back to the basic simple React Counter example app. Imagine we have this app wire-frame:
 
 ```jsx
 export class Counter extends Component {
@@ -51,7 +54,7 @@ const decrease = counter => counter - 1
 const reset = counter => 0
 ```
 
-As you might think "Oh great, so why we don't put that off and just lift the operators into the computational space of React DOM?!" - Hint: it's called `binding method`. - "Is that much more easier? We don't even need RxJS?!"
+As you might think "Oh great, so why we don't put that off and just lift the operators into the computational space of React DOM?!" - Hint: it's called `binding method` - "Is that much more easier? We don't even need RxJS?!"
 
 It is only half of the truth, there's one condition: Your app don't contain any side effects. For example:
 
@@ -61,7 +64,7 @@ const refreshTodos = () => refetchTodos().then(setState)
 
 Now, everything is different, you have to decouple both three layers: logic layer, side-effect layer, and React DOM layer all together.
 
-But first, let try to lift the logic into React DOM first. Our app might look like this in the end.
+But first, let try to lift the logic into React DOM first. Our app might look like this in the end:
 
 ```jsx
 function Counter({ counter, increase, decrease, reset }) {

@@ -56,7 +56,7 @@ export function createSubscribe() {
           ? this.props.preload()
           : this.props.children(
               this.props.defaultValue ||
-              this.props.initialState || // Some people may prefer intialState
+              this.props.initialState || // Some people may prefer initialState
                 {},
               ...args
             )

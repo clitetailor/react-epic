@@ -1,15 +1,29 @@
 import { Component, createContext, createElement } from 'react'
 import hoistStatics from 'hoist-non-react-statics'
-import { Subject, combineLatest } from 'rxjs'
 
 import { Subscribe } from './Subscribe'
+import { unsubscribeAll } from './combineEpics'
 
 const { Provider: ContextProvider, Consumer } = createContext()
 
 export class Provider extends Component {
-  combineEpics(tail, head) {
-    return function(arg) {
-      return tail(head(arg))
+  constructor() {
+    this.subscriptions = []
+  }
+
+  componentDidMount() {
+    if (this.props.runEpic) {
+      this.subscriptions.push(
+        this.props.runEpic(this.props.store)
+      )
+    }
+
+    if (this.props.runEpics) {
+      this.props.runEpics
+        .map(epic => epic(this.props.store))
+        .forEach(subscription =>
+          this.subscriptions.push(subscription)
+        )
     }
   }
 
@@ -17,16 +31,14 @@ export class Provider extends Component {
     return createElement(
       ContextProvider,
       {
-        /**
-         * This line execution should be pure. Otherwise,
-         * bad things may happen!
-         */
-        value: this.props.runEpics.reduce(this.combineEpics)(
-          this.props.store || {}
-        )
+        value: this.props.store
       },
       this.props.children
     )
+  }
+
+  componentWillUnmount() {
+    unsubscribeAll(this.subscriptions)
   }
 }
 
@@ -74,7 +86,7 @@ export function withRx({
             initialState: defaultValue || initialState,
             preload,
             observer: mapStateToProps(context),
-            args: [context]mapActionsToProps
+            args: [context]
           },
           this.subscribeFromObserver
         )
@@ -92,6 +104,6 @@ export function withRx({
       }
     }
 
-    return RxWrapper
+    return hoistStatics(RxWrapper, WrappedComponent)
   }
 }
