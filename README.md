@@ -35,10 +35,10 @@ messsages$.pipe(
 // ...
 
 @withRx({
-  mapStoreToState: ({ messages$ }) => bindState({ messages: messages$ }),
-  mapStoreToProps: ({ addMessage$ }) => bindActions({ addMessage: addMessage$ })
+  mapStateToProps: ({ messages$ }) => bindState({ messages: messages$ }),
+  mapActionsToProps: ({ addMessage$ }) => bindActions({ addMessage: addMessage$ })
 })
 export class Messages extends Component { ... }
 ```
 
-For more information about documentation and FAQ, please visit [our friendly Wiki page](https://github.com/clitetailor/react-epic/wiki/React-Epic-Wiki)!
+For more information about documentation and FAQ, please visit [our friendly Wiki](/docs/Wiki.md)!

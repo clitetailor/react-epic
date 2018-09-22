@@ -38,8 +38,8 @@ export function withRx({
   defaultValue,
   initialState,
   preload,
-  mapStoreToState,
-  mapStoreToProps,
+  mapStateToProps,
+  mapActionsToProps,
   mergeProps = defaultMergeProps
 }) {
   return function wrappedWithRx(WrappedComponent) {
@@ -73,8 +73,8 @@ export function withRx({
           {
             initialState: defaultValue || initialState,
             preload,
-            observer: mapStoreToState(context),
-            args: [context]
+            observer: mapStateToProps(context),
+            args: [context]mapActionsToProps
           },
           this.subscribeFromObserver
         )

@@ -1,23 +1,18 @@
-import { combineLatest } from 'rxjs'
-import { map } from 'rxjs/operators'
-
 /**
- * Lift an operator up to the RxJS computational space. For ex:
- * 
- * ```js   
- * 
- *    function add(a, b) {
- *      return a + b
- *    }
- * 
- *    const add$ = lift(add)
- *    add$(a$, b$).subscribe(a$)
- * 
+ * Lift an operator (aka a reducer) into computational RxJS space. The
+ * result might look something like this:
+ *
+ * ```js
+ *
+ *    lift(state$, action$, reducer)
+ *      .subscribe(state$)
+ *
  * ```
- * 
- * @param {Function} func 
  */
-export function lift(func) {
-  return (...args) =>
-    combineLatest(...args).pipe(map(args => func(...args)))
+export function lift(state$, eventSource$, func) {
+  return state$.pipe(
+    switchMap(state =>
+      eventSource$.pipe(map(action => func(state, action)))
+    )
+  )
 }
