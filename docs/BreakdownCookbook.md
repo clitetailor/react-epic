@@ -230,7 +230,7 @@ The problems come to Redux is first, you can not lift the side-effects into Redu
 
 So there's two solution to overcome this. The first solution is to lift Redux into React Epic. The second solution is to lift RxJS into Redux. Can it be?!
 
-The answer is yes. Imagine this is the reducer and how it swallow the actions stream:
+The answer is yes. Imagine this is the reducer and how it swallows the actions stream:
 
 ```js
 function counterReducer({
@@ -282,4 +282,4 @@ const counterEpic = ({ counter$, increase$ }) =>
   )
 ```
 
-But you may miss Redux some day. So be clear and thoughtful, just don't get overwhelming. That is probably what we want you to be. Enjoy! 😄
+But you may miss Redux some day. So be clear and thoughtful, just don't be overwhelming (That would probably what we don't want you to be). Enjoy! 😄

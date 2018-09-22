@@ -49,12 +49,16 @@ export function defaultMergeProps(state, props, originalProps) {
   return Object.assign({}, state, props, originalProps)
 }
 
+export function defaultMapToProps() {
+  return {}
+}
+
 export function withRx({
   defaultValue,
   initialState,
   preload,
-  mapStateToProps,
-  mapActionsToProps,
+  mapStateToProps = defaultMapToProps,
+  mapActionsToProps = defaultMapToProps,
   mergeProps = defaultMergeProps
 }) {
   return function wrappedWithRx(WrappedComponent) {
@@ -100,7 +104,7 @@ export function withRx({
           WrappedComponent,
           mergeProps(
             storeState,
-            mapStoreToProps(context),
+            mapActionsToProps(context),
             this.props
           )
         )

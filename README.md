@@ -19,7 +19,7 @@ $ npm add react-epic
 
 ## What is React Epic?
 
-React Epic is our attempt to integrate RxJS the easiest way into React without sacrificing the readability or bridging between React and Redux. By this way, you only have to write RxJS descriptions (called **Epics**) then bind it to React and everything will run like a charm! 🌟
+React Epic is our attempt to integrate RxJS the easiest way into React without sacrificing the readability or bridging between React and Redux. By this way, you only have to write RxJS subscriptions (called **Epics**) then bind it to React and everything will run like a charm! 🌟
 
 Our example, Tada ... :
 
@@ -40,5 +40,7 @@ messsages$.pipe(
 })
 export class Messages extends Component { ... }
 ```
+
+## Documentation
 
 For more information about documentation and FAQ, please visit [our friendly Wiki](/docs/Wiki.md)!
