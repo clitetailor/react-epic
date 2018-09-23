@@ -2,49 +2,10 @@
 
 Note:
 
-- The article is long (286 lines exactly) but it's worth to read so enjoy! 🤣
+- The article is long (119 lines exactly) but it's worth to read so enjoy! 🤣
 - These following knowledges come from Haskell community, what i do is just to create this library.
 
-To come to the basic React Epic breakdown, we come back to the basic simple React Counter example app. Imagine we have this app wire-frame:
-
-```jsx
-export class Counter extends Component {
-  state = {
-    counter: 0
-  }
-
-  render() {
-    return (
-      <div>
-        <p>
-          <b>Counter: </b>
-          {this.state.counter}
-        </p>
-        <button onClick={this.increase}>+</button>
-        <button onClick={this.decrease}>-</button>
-        <button onClick={this.reset}>Reset</button>
-      </div>
-    )
-  }
-
-  increase = () =>
-    this.setState({
-      counter: this.state.counter + 1
-    })
-
-  decrease = () =>
-    this.setState({
-      counter: this.state.counter - 1
-    })
-
-  reset = () =>
-    this.setState({
-      counter: 0
-    })
-}
-```
-
-If you notice, the app logic is much dead simpler than we think:
+To come to the basic React Epic breakdown, we come back to the basic simple React Counter app logic:
 
 ```jsx
 const counter = 0
@@ -54,181 +15,59 @@ const decrease = counter => counter - 1
 const reset = counter => 0
 ```
 
-As you might think "Oh great, so why we don't put that off and just lift the operators into the computational space of React DOM?!" - Hint: it's called `binding method` - "Is that much more easier? We don't even need RxJS?!"
+As you might think: "Oh great, so why we don't put that off and just bind the operators to React DOM. Is that easier?"
 
-It is only half of the truth, there's one condition: Your app don't contain any side effects. For example:
+It is only half of the truth, you're missing one condition: Your app don't contain any side-effects. For example:
 
 ```js
 const refreshTodos = () => refetchTodos().then(setState)
 ```
 
-Now, everything is different, you have to decouple both three layers: logic layer, side-effect layer, and React DOM layer all together.
+The counter app works fine because it don't contain any logic that need side-effects to take place. And when side-effects come in type of streams, that when you need RxJS.
 
-But first, let try to lift the logic into React DOM first. Our app might look like this in the end:
+You might think, why don't we just do something in the pure computational logic first and then subscribe from RxJS latter. Actually that's what i thinking. Like, if your component is pure. So let it be pure. And where you need to app process side-effects you subscribe to the effects latter.
+
+For example, the `<TodoList />` logic is pure. But when the todos need to contains some side-effect logics. It would be something like this:
 
 ```jsx
-function Counter({ counter, increase, decrease, reset }) {
-  return (
-    <div>
-      <p>
-        <b>Counter: </b>
-        {counter}
-      </p>
-      <button onClick={increase}>+</button>
-      <button onClick={decrease}>-</button>
-      <button onClick={reset}>Reset</button>
-    </div>
-  )
-}
+<Subscribe observer={todos$}>
+  {todos => <TodoList todos={todos} />}
+</Subscribe>
 ```
 
-If you notice, our current `increase` might change to something like this:
+A seperate logic inside `<TodoList />`:
 
 ```jsx
-const counter = hoc.state.counter
-
-const increase = () => hoc.setState(increase)
-const decrease = () => hoc.setState(decrease)
-const reset = () => hoc.setState(reset)
+addTodo = newTodo =>
+  this.setState({ todos: this.state.todos.concat([newTodo]) })
 ```
 
-So this is what actually how we lift the operator up:
+And a seperate side-effect logic for todos app:
 
 ```jsx
-function lift(func) {
-  return () => hoc.setState(func)
-}
+const refetchEpic = todos$ =>
+  ajax
+    .get('/todos')
+    // Handle error
+    .subscribe(todos$)
 ```
 
-So to sum up, here is what we want in pure computation. Is that right?
+Sometimes, you need to define a pure logic inside side-effect logics. We provide you a `lift` operator:
 
 ```jsx
-@lift({ counter: 0 }, {
-  increase: ({ counter }) => ({ counter: counter + 1 }),
-  decrease: ({ counter }) => ({ counter: counter - 1 }),
-  reset: () => ({ counter: 0 })
-})
-function Counter({ counter, increase, decrease, reset }) {
-  return (
-    <div>
-      <p>
-        <b>Counter: </b>
-        {counter}
-      </p>
-      <button onClick={increase}>+</button>
-      <button onClick={decrease}>-</button>
-      <button onClick={reset}>Reset</button>
-    </div>
-  )
-}
-```
-
-## React: The Good, The Bad & The Ugly
-
-The complexity of `lift` is to lift each logic function up, plus, rebind these functions back to React DOM. It's costly, yes. In the future, instead of using HOC, we might want React to run `setState` automatically for us:
-
-```jsx
-export class Counter extends Component {
-  state = {
-    counter: 0
-  }
-
-  increase() {
-    ++this.state.counter
-  }
-
-  decrease() {
-    --this.state.counter
-  }
-
-  reset() {
-    this.state.counter = 0
-  }
-
-  render() {
-    return (
-      <div>
-        <p>
-          <b>Counter: </b>
-          {this.state.counter}
-        </p>
-        <button onClick={this.increase}>+</button>
-        <button onClick={this.decrease}>-</button>
-        <button onClick={this.reset}>Reset</button>
-      </div>
-    )
-  }
-}
-```
-
-And maybe, this one either:
-
-```jsx
-export class Counter extends Component {
-  state = {
-    todos: []
-  }
-
-  async refetchTodos = () => {
-    let todos = await fetch(...)
-    this.state.todos = todos
-  }
-
-  render() {
-    return (
-      <div>
-        <ul>{this.state.todos.map(todo => <li>{todo}</li>)}</ul>
-        <button onClick={this.refetchTodos}>Refetch</button>
-      </div>
-    )
-  }
-}
-```
-
-Actually, Angular has done better than React at this point. But then, after ask thousand of questions about how the architecture should be, we might want to call `setState` at some points. Like we call `ngZone.run` in Angular.
-
-## Lifting the logic up
-
-So here is how we do it by putting the RxJS layer between logic layer and React DOM layer:
-
-```jsx
-const counter$ = new BehaviorSubject(0)
-
-increaseEvent$.subscribe(increase$(counter$))
-decreaseEvent$.subscribe(decrease$(counter$))
-resetEvent$.subscribe(reset$(counter$))
-```
-
-And then bind it to our React DOM:
-
-```jsx
-@withRx({
-  initialState,
-  mapStateToProps: ({ counter$ }) => bindState({ counter }),
-  mapActionsToProps: ({ increase$, decrease$, reset$ }) => bindActions({ increase: increase$, decrease: decrease$, reset: reset$ })
-})
-export class Counter extends Component { ... }
-```
-
-As you might see, the lift operator might be various and not consistency. So i will have to design something good, applicative to the current situation. If you notice, every operator we want to lift is in the shape of a reducer. It all come with a state and an event source. So here is our ideal lift operator for our situation:
-
-```jsx
-function lift(state$, eventSource$, func) {
-  return state$.pipe(
-    switchMap(state =>
-      eventSource$.pipe(map(data => func(state, data)))
-    )
-  )
-}
+const addTodoEpic = ({ todos$, addTodo$ }) =>
+  lift(todos$, addTodo$, (todos, newTodo) =>
+    todos.concat([newTodo])
+  ).subscribe(todos$)
 ```
 
 ## What about Redux?
 
-Redux is not bad at all. Actually, i have hated Redux before but now i love it. There are two things Redux force us to do (not Redux does for us as many people confuse). Encapsulate the events stream so that we can recreate the actions stream on remote server and replay it (not undo it. the real undo is to caculate the previous state based on the current state. so that we have to do is to reverse the reducer and the actions stream to archive the real undo. what we usually do is to store the reference to the previous states and unpop it). The second is to put things together so that you have to design the system in its very own core. From inside out (not outside in).
+Redux is not bad at all. Actually, i have hated Redux before but now i love it. There are two things Redux force us to do (not Redux does for us as many people confuse). First is to Encapsulate the events stream so that we can recreate the actions stream on remote server and replay it (not undo it. the real undo is to caculate the previous state based on the current state. so that we have to do is to reverse the reducer and the actions stream to archive the real undo. what we usually do is to store the reference to the previous states and unpop it). The second is to put app logics together so that you have to design the system in its very own core. It is from Inside out (not Outside in as we usually do with Angular DI).
 
-The problems come to Redux is first, you can not lift the side-effects into Redux yourself. That why we need Redux Saga, Redux Observable, etc. The second problem come to Redux is that it is so costly to encapsulate all the actions stream to make a good business modal. Actuallly most of us don't need it, what we almost need is to encapsulate mostly of our actions (not every actions).
+The problems come to Redux is first, you can not lift the side-effects into Redux yourself. That why we need Redux Saga, Redux Observable, etc. The second problem come to Redux is that it is so expensive to encapsulate every single actions in your app logic. Sometimes, actions stream is only to report errors so it's unnecessary to encapsulate all of theme.
 
-So there's two solution to overcome this. The first solution is to lift Redux into React Epic. The second solution is to lift RxJS into Redux. Can it be?!
+But you may miss Redux some day. So if you still love Redux, there're three solution to overcome this. The first is to use library like Redux Observer, MobX, Redux Saga. The second solution is to lift Redux into RxJS. The third solution (You can guess) is to lift RxJS into Redux. Can it be?!
 
 The answer is yes. Imagine this is the reducer and how it swallows the actions stream:
 
@@ -256,7 +95,7 @@ function counterMiddleware = store => {
 }
 ```
 
-And we **still** have to subscribe the state using React Epic (Sorry about the **still** word):
+And we **still** have to subscribe the state using React Epic (Sorry about this **still** word):
 
 ```jsx
 return (
@@ -266,20 +105,14 @@ return (
 )
 ```
 
-The second way, you know, is to write the epics and bind it to **HOC**
+The second way, is to lift Redux into RxJS, i will let you implement it. But remember the `lift` operator almost do the same thing for you:
 
 ```jsx
-function createStore() {
-  return {
-    counter$: new BehaviorSubject([])
-    increase$: new Subject()
-  }
-}
-
-const counterEpic = ({ counter$, increase$ }) =>
-  lift(counter$, increase$, counter => counter + 1).subscribe(
-    counter$
-  )
+lift(state$, action$, (state, action) => newState).subscribe(
+  state$
+)
 ```
 
-But you may miss Redux some day. So be clear and thoughtful, just don't be overwhelming (That would probably what we don't want you to be). Enjoy! 😄
+So be clear and thoughtful, just don't be overwhelming (That would probably what we don't want you to be). Enjoy! 😄
+
+Next Chapter: [Lift Behind the Scene](LiftBehindTheScene.md)

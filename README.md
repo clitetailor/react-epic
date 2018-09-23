@@ -1,6 +1,12 @@
-# React Epic
+<div align="center">
+  
+  # React Epic
+
+  <img src="icons/ReactEpic.png" alt="ReactEpic" width=25% height=25% />
 
 Featured Subscriber and HOC for React & RxJS ✨🚀🤘👨‍🚀🐟🐠
+
+</div>
 
 ## Install
 
@@ -28,15 +34,15 @@ const messages$ = new BehaviorSubject([])
 
 messsages$.pipe(
   switchMap(messages => addMessage$.pipe(
-    map(newMessage => messages.push(newMessage))
+    map(newMessage => messages.concat([newMessage]))
   ))
 ).subscribe(messages$)
 
 // ...
 
-@withRx({
-  mapStateToProps: ({ messages$ }) => bindState({ messages: messages$ }),
-  mapActionsToProps: ({ addMessage$ }) => bindActions({ addMessage: addMessage$ })
+@WithRx({
+  mapStateToProps: ({ messages$ }) => ({ messages: messages$ }),
+  mapActionsToProps: ({ addMessage$ }) => ({ addMessage: addMessage$ })
 })
 export class Messages extends Component { ... }
 ```

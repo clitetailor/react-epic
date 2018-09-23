@@ -4,11 +4,15 @@ import hoistStatics from 'hoist-non-react-statics'
 
 import { Subscribe } from './Subscribe'
 import { combineSubscriptions } from './combineSubscriptions'
+import { bindState } from './bindState'
+import { bindActions } from './bindActions'
 
 const { Provider: ContextProvider, Consumer } = createContext()
 
 export class Provider extends Component {
-  constructor() {
+  constructor(props) {
+    super(props)
+
     this.subscription = new Subscription()
   }
 
@@ -53,7 +57,7 @@ export function defaultMapToProps() {
   return {}
 }
 
-export function withRx({
+export function WithRx({
   defaultValue,
   initialState,
   preload,
@@ -92,7 +96,7 @@ export function withRx({
           {
             initialState: defaultValue || initialState,
             preload,
-            observer: mapStateToProps(context),
+            observer: bindState(mapStateToProps(context)),
             args: [context]
           },
           this.subscribeFromObserver
@@ -104,13 +108,13 @@ export function withRx({
           WrappedComponent,
           mergeProps(
             storeState,
-            mapActionsToProps(context),
+            bindActions(mapActionsToProps(context)),
             this.props
           )
         )
       }
     }
 
-    return hoistStatics(RxWrapper, WrappedComponent)
+    return RxWrapper
   }
 }

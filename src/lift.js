@@ -1,3 +1,5 @@
+import { switchMap, map } from 'rxjs/operators'
+
 /**
  * Lift an operator (aka a reducer) into computational RxJS space. The
  * result might look something like this:
