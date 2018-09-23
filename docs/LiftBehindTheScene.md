@@ -30,7 +30,7 @@ function lift(func) {
 
 I know, the second lift is so miraculous. But it can not against the fact that the second lift is the correct one for my situation. You may question me why.
 
-The fact is both of the lift function has their point of view about how a lifted function should be. To take a look closer, let consider an example of three arguments function.
+The fact is both of the lift function has their point of view about how a lifted function should be. To take a look closer, let consider an example of three arguments functions.
 
 ```jsx
 function lift(func) {
@@ -68,11 +68,11 @@ todos$
   .subscribe(todos$)
 ```
 
-People usually tends to be tricked into the ideal that this is a loop but it doesn't.
+People usually tends to be tricked into the ideal that this is a loop. But it doesn't.
 
 I will tell you something. The change doesn't result in emitting values. In another word, it tell the stream that arg1 and arg2 has changed but does not emit values. The real stream emits values comes from arg3. That why i consider `switchMap` is static and `map` is dynamic.
 
-So why does this important. If you notice, the above `todos` and `addTodo` will stretch across all other state machine pattern. What is the state machine pattern formally? And if you have another notice, why we have two nesting `switchMap` in the three argument example.
+So why does this important. If you notice, the above pattern of `todos` and `addTodo` will stretch across all other state machine pattern. What is the state machine pattern formally? And if you have another notice, why we have two nesting `switchMap` in the three argument example?
 
 The fact is in the offical implementation of lift function there're only two arguments:
 
@@ -97,7 +97,7 @@ combineLatest(arg1$, arg2$).pipe(
 )
 ```
 
-So the final form will only contain two arguments. And if you have three or more arguments, depends on which arguments need to emit values, we can combine them together! For example:
+So the final form will only contain two arguments. And if you have three or more arguments, depends on which argument that emits values, we can combine them together! For example:
 
 ```jsx
 const liftedOperator = lift(someOperator)
@@ -108,7 +108,7 @@ liftedOperator(
 )
 ```
 
-To make you better understand of how it works, i will better rewrite it implementation with **Ninja Comments**:
+To make you better understand of how it works, i will better rewrite its implementation with **Ninja Comments**:
 
 ```jsx
 function lift(reducer) {
@@ -121,7 +121,19 @@ function lift(reducer) {
 }
 ```
 
-Huh, what the heck! Your eyes not blur and you are seeing what i'm showing you is another reducer. Does it reminds you of Redux? Are you missing something? The fact is that all application implementations contains two things: the app own state and the external actions (or outer event space). The fact, it's not remind me of Redux but Haskell State. I have had a hard time take a deep investigation into Haskell State and don't understand anything about how it works and why it even exists! Then i come up with one diagram that helps me a little about understading it:
+Huh, what the heck! Your eyes are not blur and you are seeing what i'm showing you is another reducer?! 🤔 Does it reminds you of Redux? Are you missing something? The fact is that all application implementations consist of two things: the app own state and the external actions (or outer event space). The fact, it's not remind me of Redux but Haskell State. I have had a hard time taking deep investigation into Haskell State and don't understand anything about how it works and why it even exists! Then i come up with one diagram that helps me a little about understading it:
+
+```md
+                   -> state1
+runState --->     /           \
+                 /             v
+              state4         state2
+                ^            /
+getState <---    \          /
+                   state3 <-
+```
+
+Haskell states run inside a closure (a state loop), `runState` project values and actions into state. It trigger the state change, toggle between states. And finally, with some kind of magic, `getState` project the state value out of the loop.
 
 So if i'm not wrong, the lift function work the same way with `runState` (Please correct me if i'm wrong). So if you don't might, i might translate the following piece of code:
 
@@ -142,7 +154,7 @@ do
   pure (todos)
 ```
 
-Actually you will see i embedded state and action arguments into lift arguments. Someone might love this, someone might hate this because it breaks the semantic meaning of lift operator. But i still take it because it is my decide choice (And i live with it). It is the rare case that your operator don't stick with your target of your state and your action. And reusing such this kind of operators might be troublesome that lead to the misconception that: They all the same. So for example one may edit this operator for convenient but don't know that it might break other functions. Reusing it is not hard, you already had the operator by the way. There's two ways to overcome this. The first is to relift the operator
+Actually you will see i embedded state and action arguments into lift arguments somewhere. Someone might love this, someone might hate this because it breaks the semantic meaning of lift operator. But i still take it because it is my decide choice (And i live with it). It is the rare case that your operator don't stick with your target of your state and your action. And reusing such this kind of operators might be troublesome that lead to the misconception that: They all the same. So for example one may edit this operator for convenient but don't know that it might break other functions. Reusing it is not hard, you already had the operator by the way. There's two ways to overcome this. The first is to relift the operator
 
 ```jsx
 lift(state$, action$, operator)
@@ -215,3 +227,7 @@ currentClockCounter = initialCounterNumber + numberOfTicks
 ```
 
 And state may combine of states and actions may combine of actions. That's how your app still works good if you have a good design architecture. So you know what you are doing. Cheers! 🍻
+
+Back: [Table of Contents](Wiki.md)
+
+Or: [Go back to Home Page](../README.md)

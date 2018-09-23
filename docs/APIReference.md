@@ -1,6 +1,6 @@
 # API Reference
 
-React Epic provides two ways to subscribe to a stream: By either using `Subscribe` component or providing a component with a HOC via `withRx`. Otherwise, React Epic provide two utilities to work with state and props `bindState` and `bindActions`.
+React Epic provides two ways to subscribe to a stream: By either using `<Subscribe />` or providing a component with a HOC via `withRx`. Furthermore, there're three utilities to work with state and actions binding are `bindState`, `bindAction` and `bindActions`.
 
 ## Subscribe
 
@@ -30,12 +30,10 @@ export class Counter extends Component {
         defaultValue={this.state.counter}
       >
         {counter => (
-          <div>
-            <p>
-              <b>Counter: </b>
-              {counter}
-            </p>
-          </div>
+          <p>
+            <b>Counter: </b>
+            {counter}
+          </p>
         )}
       </Subscribe>
     )
@@ -43,18 +41,53 @@ export class Counter extends Component {
 }
 ```
 
-## Store
+## Provider
+
+Options schema for Provider.
+
+| Property | Alias | Required | Default Value | Description                              |
+| -------- | ----- | :------: | :-----------: | ---------------------------------------- |
+| store    |       |    -     |      {}       | Provide the app with a store             |
+| runEpic  |       |    -     |       -       | Run store epic                           |
+| runEpics |       |    -     |       -       | Run store epics if there're many of them |
+
+### Example with Provider
+
+```jsx
+<Provider store={createStore()} runEpics={[counterEpic]}>
+  <CounterApp />
+</Provider>
+```
 
 ## HOC or Dependency Injection
 
-Options schema for HOC.
+Options schema for WithRx.
 
-| Property        | Alias        | Required | Default Value | Description                                                 |
-| --------------- | ------------ | :------: | :-----------: | ----------------------------------------------------------- |
-| initialState    | defaultValue |    -     |      {}       | The default value of the stream                             |
-| mapStoreToState |              |    -     |  () => ({})   | Inject the store value into HOC state                       |
-| mapStoreToProps |              |    -     |  () => ({})   | Bind store's actions to component props                     |
-| mergeProps      |              |    -     | Object.assign | Merge the store state, actions and component props together |
-| preload         |              |    -     |     null      | Preload the component with render prop                      |
+| Property        | Alias        | Required |            Default Value             | Description                                                 |
+| --------------- | ------------ | :------: | :----------------------------------: | ----------------------------------------------------------- |
+| initialState    | defaultValue |    -     |                  {}                  | The default value of the stream                             |
+| mapStoreToState |              |    -     |              () => ({})              | Inject the store value into HOC state                       |
+| mapStoreToProps |              |    -     |              () => ({})              | Bind store's actions to component props                     |
+| mergeProps      |              |    -     | Object.assign(state, actions, props) | Merge the store state, actions and component props together |
+| preload         |              |    -     |                 null                 | Preload the component with render prop                      |
+
+### Example with WithRx:
+
+```jsx
+@WithRx({
+  initialState: {
+    counter: 0
+  },
+  mapStateToProps: ({ counter$ }) => ({ counter: counter$ }),
+  mapActionsToProps: ({ increase$, decrease$, reset$ }) => ({
+    increase: increase$,
+    decrease: decrease$,
+    reset: reset$
+  })
+})
+export class CounterApp extends Component {
+  /* ... */
+}
+```
 
 Next: [Handling Error](HandlingError.md)
