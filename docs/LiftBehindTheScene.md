@@ -121,7 +121,7 @@ function lift(reducer) {
 }
 ```
 
-Huh, what the heck! Your eyes are not blur and you are seeing what i'm showing you is another reducer?! 🤔 Does it reminds you of Redux? Are you missing something? The fact is that all application implementations consist of two things: the app own state and the external actions (or outer event space). The fact, it's not remind me of Redux but Haskell State. I have had a hard time taking deep investigation into Haskell State and don't understand anything about how it works and why it even exists! Then i come up with one diagram that helps me a little about understading it:
+Huh, what the heck! Your eyes are not blur and you are seeing what i'm showing you is another reducer?! 🤔 Does it reminds you of Redux? Are you missing something? The fact is that all application implementations consist of two things: the app own state and the external actions (or outer event space). The fact, it's not remind me of Redux but Haskell State. I have had a hard time taking deep investigation into Haskell State and don't understand anything about how it works and why it even exists! Then i come up with one diagram that helps me a bit about understading it:
 
 ```md
                    -> state1
@@ -133,7 +133,7 @@ getState <---    \          /
                    state3 <-
 ```
 
-Haskell states run inside a closure (a state loop), `runState` project values and actions into state. It trigger the state change, toggle between states. And finally, with some kind of magic, `getState` project the state value out of the loop.
+Haskell states run inside a closure (a state loop), `runState` project values and actions into state loop. It triggers the state change, toggle between states. And finally, with some kind of magic, `getState` project the state value out of the loop.
 
 So if i'm not wrong, the lift function work the same way with `runState` (Please correct me if i'm wrong). So if you don't might, i might translate the following piece of code:
 
@@ -228,6 +228,6 @@ currentClockCounter = initialCounterNumber + numberOfTicks
 
 And state may combine of states and actions may combine of actions. That's how your app still works good if you have a good design architecture. So you know what you are doing. Cheers! 🍻
 
-Back: [Table of Contents](Wiki.md)
+To top: [Table of Contents](Wiki.md)
 
 Or: [Go back to Home Page](../README.md)

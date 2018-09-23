@@ -2,7 +2,7 @@
   
   # React Epic
 
-  <img src="icons/ReactEpic.png" alt="ReactEpic" width=25% height=25% />
+  <img src="icons/ReactEpic.png" alt="ReactEpic" width=36% height=36% />
 
 Featured Subscriber and HOC for React & RxJS ✨🚀🤘👨‍🚀🐟🐠
 
