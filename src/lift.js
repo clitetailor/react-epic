@@ -11,10 +11,13 @@ import { switchMap, map } from 'rxjs/operators'
  *
  * ```
  */
-export function lift(state$, eventSource$, func) {
+export function lift(...args, func) {
+  if (args.length === 2) {
+    return lift(func)(...args)
+  }
   return state$.pipe(
     switchMap(state =>
-      eventSource$.pipe(map(action => func(state, action)))
+      action$.pipe(map(action => func(state, action)))
     )
   )
 }
