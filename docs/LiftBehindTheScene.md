@@ -230,4 +230,4 @@ And state may combine of states and actions may combine of actions. That's how y
 
 To top: [Table of Contents](Wiki.md)
 
-Or: [Go back to Home Page](../README.md)
+Next Chapter: [Execution Context in RxJS](RxJSExecutionContext.md)
