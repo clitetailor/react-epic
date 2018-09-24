@@ -32,7 +32,7 @@ In the above example, everything was fine. Except, the stream will be suspended 
 return of(err)
 ```
 
-You replace the current stream with a stream of an error object. That's why the stream break down and freezed. At the time i write this post. The RxJS `catchError` operator already been written, but haven't been deployed yet, so a lot of people failed at handling errors in RxJS. 
+You replace the current stream with a stream of an error object. That's why the stream break down and freezed. At the time i write this post. The RxJS `catchError` operator already been written, but haven't been deployed yet, so a lot of people failed at handling errors in RxJS.
 
 So here is a simple work around on how to handle the error in RxJS:
 
@@ -54,6 +54,8 @@ const errorHandler = catchError((err, resetStream) => {
 })
 ```
 
-However, even error handler can be failed. So make sure that you are not overthinking of how handling error work!
+However, I will say that even error handler can be failed and the line of handling error or not is blurry. So make sure that you added an error handler and not overthinking how handling error should works!
 
-Next: [React Epic Breakdown Cookbook](BreakdownCookbook.md)
+To top: [Table of Contents](Wiki.md)
+
+Next: [Store and More on Dependency Injection](StoreAndDI.md)

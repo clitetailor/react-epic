@@ -143,4 +143,6 @@ lift(state$, action$, (state, action) => newState).subscribe(
 
 So be clear and thoughtful, just don't be overwhelming (That would probably what we don't want you to be). Enjoy! 😄
 
+To top: [Table of Contents](Wiki.md)
+
 Next Chapter: [Lift Behind the Scene](LiftBehindTheScene.md)

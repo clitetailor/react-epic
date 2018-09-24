@@ -125,13 +125,12 @@ Huh, what the heck! Your eyes are not blur and you are seeing what i'm showing y
 
 ```md
                    -> state1
-
-runState ---> / \
- / v
-state4 state2
-^ /
-getState <--- \ /
-state3 <-
+runState --->     /          \
+                 /            v
+              state4        state2
+                 ^           /
+getState <---     \         /
+                   state3 <-
 ```
 
 Haskell states run inside a closure (a state loop), `runState` project values and actions into state loop. It triggers the state change, toggle between states. And finally, with some kind of magical way, `getState` project the state value out of the loop.
@@ -217,8 +216,8 @@ So here we come up with a formular of what state really is:
 
 ```md
 state = initialState + action + action + ... + action
-\-------------v---------------/
-a list of actions
+                      \-------------v---------------/
+                            a list of actions
 ```
 
 So that you know how the interval function works. It works by two things, the initial counter, and the clock tick event:

@@ -12,9 +12,20 @@ import { combineSubscriptions } from './combineSubscriptions'
  *
  * ```
  */
-export function combineEpics(epics) {
+export function combineEpics(...args) {
   return store =>
     combineSubscriptions(
-      Object.keys(epics).map(key => epics[key](store[key]))
+      args.map(epics => {
+        if (isFunction(epics)) {
+          /**
+           * Support shared root epic
+           */
+          return epics(store)
+        }
+
+        return combineSubscriptions(
+          Object.keys(epics).map(key => epics[key](store[key]))
+        )
+      })
     )
 }

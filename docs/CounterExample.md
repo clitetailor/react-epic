@@ -61,7 +61,7 @@ Or you can even do it better:
 
 ```jsx
   componentDidMount() {
-    this.subscription = merge([
+    this.subscription = merge(
       lift(
         this.counter$,
         this.increase$,
@@ -73,7 +73,7 @@ Or you can even do it better:
         counter => counter - 1
       ),
       this.reset$.pipe(mapTo(0))
-    ]).subscribe(this.counter$)
+    ).subscribe(this.counter$)
   }
 ```
 
@@ -184,5 +184,7 @@ export class CounterApp extends Component {
 That's it! This is a very Rapid Recipe of how we define a wonderful state machine Counter App using React, RxJS and React Epic.
 
 For more information on how to Handling Error go to next Chapter: [Handling Error](HandlingError.md)
+
+To top: [Table of Contents](Wiki.md)
 
 Or you can jump to [React Epic Breakdown Cookbook](BreakdownCookbook.md)
