@@ -6,6 +6,7 @@ import { Subscribe } from './Subscribe'
 import { combineSubscriptions } from './combineSubscriptions'
 import { bindState } from './bindState'
 import { bindActions } from './bindActions'
+import { isFunction } from './isFunction'
 
 const { Provider: ContextProvider, Consumer } = createContext()
 
@@ -57,14 +58,66 @@ export function defaultMapToProps() {
   return {}
 }
 
-export function WithRx({
-  defaultValue,
-  initialState,
-  preload,
-  mapStateToProps = defaultMapToProps,
-  mapActionsToProps = defaultMapToProps,
-  mergeProps = defaultMergeProps
-}) {
+export function WithRx(
+  initialDefaultValue,
+  initialMapStateToProps,
+  initialMapActionsToProps,
+  initialMergeProps,
+  extraOptions
+) {
+  let withRxOptions
+
+  if (isFunction(initialDefaultValue)) {
+    withRxOptions = {}
+
+    withRxOptions.mapStateToProps = initialDefaultValue
+    if (initialMapStateToProps) {
+      withRxOptions.mapActionsToProps = initialMapStateToProps
+    }
+    if (initialMapActionsToProps) {
+      withRxOptions.mergeProps = initialMapActionsToProps
+    }
+
+    if (initialMergeProps) {
+      extraOptions = initialMergeProps
+      Object.assign(withRxOptions, extraOptions)
+    }
+  } else if (isFunction(initialMapStateToProps)) {
+    // Default version of WithRx
+
+    withRxOptions = {
+      initialState: initialDefaultValue,
+      mapStateToProps: initialMapStateToProps,
+      mapActionsToProps: initialMapActionsToProps,
+      mergeProps: initialMergeProps
+    }
+
+    if (extraOptions) {
+      Object.assign(withRxOptions, extraOptions)
+    }
+  } else {
+    withRxOptions = initialDefaultValue
+
+    if (initialMapStateToProps) {
+      extraOptions = initialMapStateToProps
+      Object.assign(withRxOptions, extraOptions)
+    }
+  }
+
+  /**
+   * Version with first preload argument is considered unsafe so if you
+   * want to use preload, use the first version with extraOptions.
+   */
+
+  const {
+    defaultValue,
+    initialState,
+    preload,
+    mapStateToProps = defaultMapToProps,
+    mapActionsToProps = defaultMapToProps,
+    mergeProps = defaultMergeProps
+  } = withRxOptions
+
   return function wrappedWithRx(WrappedComponent) {
     class RxWrapper extends Component {
       constructor(props) {

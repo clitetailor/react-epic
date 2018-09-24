@@ -14,21 +14,21 @@ function lift(func) {
 
 function lift(func) {
   return (...args$, lastArg$) => {
-    const lastFunc = () => lastArg$.pipe(
-      map(lastArg => func(...args, lastArg))
+    const lastFunc = (...accumArgs) => lastArg$.pipe(
+      map(lastArg => func(...accumArgs, lastArg))
     )
 
     return args$.reduce(
-      ([accumFunc, accumArgs], nextArg$) => nextArg$.pipe(
-          switchMap(nextArg => accumFunc(...accumArgs, nextArg))
+      (accumFunc, nextArg$) => accumArgs => nextArg$.pipe(
+        switchMap(nextArg => accumFunc(...accumArgs, nextArg))
       ),
-      [lastFunc, []]
-    )
+      lastFunc
+    )([])
   }
 }
 ```
 
-I know, the second lift is so miraculous. But it can not against the fact that the second lift is the correct one for my situation. You may question me why.
+I know, the second lift is so miraculous. But it can not against the fact that the second is the correct one for my situation. You may question me why.
 
 The fact is both of the lift function has their point of view about how a lifted function should be. To take a look closer, let consider an example of three arguments functions.
 
@@ -125,12 +125,13 @@ Huh, what the heck! Your eyes are not blur and you are seeing what i'm showing y
 
 ```md
                    -> state1
-runState --->     /           \
-                 /             v
-              state4         state2
-                ^            /
-getState <---    \          /
-                   state3 <-
+
+runState ---> / \
+ / v
+state4 state2
+^ /
+getState <--- \ /
+state3 <-
 ```
 
 Haskell states run inside a closure (a state loop), `runState` project values and actions into state loop. It triggers the state change, toggle between states. And finally, with some kind of magical way, `getState` project the state value out of the loop.
@@ -216,8 +217,8 @@ So here we come up with a formular of what state really is:
 
 ```md
 state = initialState + action + action + ... + action
-                      \-------------v---------------/
-                            a list of actions
+\-------------v---------------/
+a list of actions
 ```
 
 So that you know how the interval function works. It works by two things, the initial counter, and the clock tick event:
