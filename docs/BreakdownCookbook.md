@@ -2,7 +2,7 @@
 
 Note:
 
-- The article is long (119 lines exactly) but it's worth to read so enjoy! 🤣
+- The article is long (147 lines exactly) but it's worth to read so enjoy! 🤣
 - These following knowledges come from Haskell community, what i do is just to create this library.
 
 To come to the basic React Epic breakdown, we come back to the basic simple React Counter app logic:
@@ -128,7 +128,7 @@ const reduxEpics = ({ store, addTodos$, refetchSuccessful$ }) => merge(
 ).subscribe(store.dispatch)
 
 /**
- * This one is a litte bit tricky
+ * This one is a litte bit trickier
  */
 const mapStateToProps = ({ store }) => createState(store, ({ todos }) => ({ todos }))
 ```

@@ -133,9 +133,9 @@ getState <---    \          /
                    state3 <-
 ```
 
-Haskell states run inside a closure (a state loop), `runState` project values and actions into state loop. It triggers the state change, toggle between states. And finally, with some kind of magic, `getState` project the state value out of the loop.
+Haskell states run inside a closure (a state loop), `runState` project values and actions into state loop. It triggers the state change, toggle between states. And finally, with some kind of magical way, `getState` project the state value out of the loop.
 
-So if i'm not wrong, the lift function work the same way with `runState` (Please correct me if i'm wrong). So if you don't might, i might translate the following piece of code:
+So if i'm not wrong, the lift function works the same way with `runState` (Please correct me if i'm wrong). So if you don't might, i will translate the following piece of code:
 
 ```jsx
 addTodo$.next('Have a breakfast')
