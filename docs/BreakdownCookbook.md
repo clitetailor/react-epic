@@ -105,7 +105,35 @@ return (
 )
 ```
 
-The second way, is to lift Redux into RxJS, i will let you implement it. But remember the `lift` operator almost do the same thing for you:
+The second way, is to lift Redux into RxJS. Actually, i have prepared a bridge between React Epic and Redux (For people who love Redux tooling):
+
+```jsx
+function createEpicStore() {
+  return {
+    store: createStore(), // Create Redux Store
+    addTodo$: new Subject(),
+    refetchSuccessful$: new Subject()
+  }
+}
+
+const reduxEpics = ({ store, addTodos$, refetchSuccessful$ }) => merge(
+  createAction(addTodos$, action => {
+    type: 'ADD_TODO',
+    payload: action
+  }),
+  createAction(refetchSuccesful$, action => {
+    type: 'RESET_TODOS',
+    payload: action
+  })
+).subscribe(store.dispatch)
+
+/**
+ * This one is a litte bit tricky
+ */
+const mapStateToProps = ({ store }) => createState(store, ({ todos }) => ({ todos }))
+```
+
+Remember, we got another example of how a reducer would be:
 
 ```jsx
 lift(state$, action$, (state, action) => newState).subscribe(

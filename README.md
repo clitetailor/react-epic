@@ -30,22 +30,24 @@ React Epic is our attempt to integrate RxJS the easiest way into React without s
 Our example, Tada ... :
 
 ```jsx
-const messages$ = new BehaviorSubject([])
+const todos$ = new BehaviorSubject([])
 
-messsages$.pipe(
-  switchMap(messages => addMessage$.pipe(
-    map(newMessage => messages.concat([newMessage]))
+todos$.pipe(
+  switchMap(todos => addTodo$.pipe(
+    map(newTodo => todos.concat([newTodo]))
   ))
-).subscribe(messages$)
+).subscribe(todos$)
 
-// ...
+/* ... */
 
 @WithRx({
-  mapStateToProps: ({ messages$ }) => ({ messages: messages$ }),
-  mapActionsToProps: ({ addMessage$ }) => ({ addMessage: addMessage$ })
+  mapStateToProps: ({ todos$ }) => ({ todos: todos$ }),
+  mapActionsToProps: ({ addTodo$ }) => ({ addTodo: addTodo$ })
 })
-export class Messages extends Component { ... }
+export class Todos extends Component { ... }
 ```
+
+This library was influenced largely by Dart StreamBuilder, Redux Observable and React Redux!
 
 ## Documentation
 
