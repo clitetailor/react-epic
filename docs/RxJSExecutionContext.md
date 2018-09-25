@@ -60,13 +60,19 @@ function register() {
 }
 ```
 
-There was actually another problem that blocked me from the real solution. That is how to unsubscribe the local stream at the local component. Actually as i have said we don't even need to unsubscribe it due to the use of `<Subscribe />`. But the most of us usually being treated into the ideal of using HOC so it will do the rest stuff for us or we can have a consistency implementation of all components. Actually i can provide you with a HOC that provide the local state for you. But it's not worth. Here is the reason why:
+## Only Relationship Matters
+
+You will think that there's a principal pattern here. Like what i made with reducer. There's no principal pattern in this case. The first example show the dependence of the source stream on the shared stream based on `throttle`. The second example shows the dependence of the parent execution on its children execution context based on `takeWhile` relation. So the only relationship here is the relations. It will be the principle on your design choice and choosing this operator over another operator is just your decision.
+
+## Local Store doesn't Exists
+
+There was actually another problem that blocked me from the clarity is that how to unsubscribe the local stream at the local component. Actually as i have said we don't even need to unsubscribe the stream on `componentWillUnmount` due to the use of `<Subscribe />`. But the most of us usually being treated into the ideal of using HOC so it will do the rest stuffs for us and we can have a consistency implementation of the all components. Actually i can provide you with a HOC that provide the local state for you. But it's not worth. Here is the reason why:
 
 ```js
 @WithRx2(localStore, runEpic, mapStateToProps, mapActionsToProps, mergeProps, initialStateOrPreload, ...blaBlaBla)
 ```
 
-As you might see the api will look much more complicated. Especially, when you connect with a shared state. It seems to far more expensive than we already have now:
+As you might see the api will look much more complicated. Especially, when you connect with a shared state. It seems to far more expensive than we already have now. So greatest solution i think is to subscribe the relations manually and then manually unsubscribe it:
 
 ```jsx
 export App extends Component {
@@ -103,7 +109,7 @@ export App extends Component {
 }
 ```
 
-So i make a hard decision here is to keep the old `WithRx` api and let us do such things manually with the use of `<Subscribe />`
+So i make a hard decision here is to keep the old `WithRx` implementation so that it can let us move forward with the use of `<Subscribe />`
 
 To top: [Table of Contents](Wiki.md)
 

@@ -4,7 +4,7 @@ After several chapters of Getting Started and React Epic in Action, you might wo
 
 The fact that we have discussed and use `lift` operator so frequent that we haven't have chance to take a look back and breakdown on what `lift` operator really is. So here is how we start:
 
-My first ideal of the `lift` function is simple, is to create a function generator for lifting pure logic functions into RxJS. So i come up with two functions without actually knowing clearly how it works:
+My first ideal of the `lift` function is simple, is to create a function for lifting the pure logic functions into RxJS. So i come up with two functions without actually knowing clearly how it works:
 
 ```jsx
 function lift(func) {
@@ -56,7 +56,7 @@ function lift(func) {
 
 What is the different between `combineLatest` and the combination of `switchMap` and `map`. Why we only run `map` on the last argument?
 
-So i take more time investigate deeper into the effect of these three functions and the result is fantasy. `combineLatest` will emit everytime any of the arguments does. So i will consider it fully dynamic. What about `switchMap` and `map`? I consider `switchMap` static and `map` dynamic. This may a little bit tricky against the fact that `switchMap` change everytime the argument emits a value. Consider the following example:
+So i take more time investigate deeper into the effect of these three functions and the result is fantasy. `combineLatest` will emit everytime any of these arguments emits a value. So i will consider it's fully dynamic. What about `switchMap` and `map`? I consider `switchMap` is static and `map` is dynamic. This may a little bit tricky against the fact that `switchMap` changes everytime its argument emits a value. Consider the following example:
 
 ```jsx
 todos$
@@ -87,7 +87,7 @@ function lift(func) {
 }
 ```
 
-If you notice, we don't care how many nesting `switchMap` are there, the final result will only depend on the last argument. The same think work with `map` (You can have multiple nesting map either). So how to compact it? It's easy:
+If you notice, we don't care how many nesting `switchMap` are there, the final result will only depend on the last argument. The same think work with `map` (You can have multiple nested `map` either). So how to compact it? It's easy:
 
 ```jsx
 combineLatest(arg1$, arg2$).pipe(

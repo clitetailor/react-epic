@@ -1,6 +1,6 @@
 # Handling Error
 
-The fact is if there is any of your stream breakdown with an error, the whole system can be going wrong. Here is a simple example of how your system can going down hopelessly without any expectation:
+The fact is if there is any of your stream breakdown with an error, the whole system can go wrong. Here is a simple example of how your system can go down hopelessly without any expectation:
 
 ```jsx
 number$.pipe(
@@ -26,13 +26,13 @@ const errorHandler = catchError(err => {
 })
 ```
 
-In the above example, everything was fine. Except, the stream will be suspended and cannot be reset it if any exception is thrown. Here is the reason why. When you type:
+In the above example, everything is fine. Except, the stream will be suspended and cannot resume if any exception is thrown at runtime. Here is the reason why. As usual you will type:
 
 ```jsx
 return of(err)
 ```
 
-You replace the current stream with a stream of an error object. That's why the stream break down and freezed. At the time i write this post. The RxJS `catchError` operator already been written, but haven't been deployed yet, so a lot of people failed at handling errors in RxJS.
+without understanding how it works. By that way, you replace the current stream with a stream of the error object you handle. That's why the stream will be freezed after you handle the first error. At the time i write this post, the document about RxJS `catchError` operator already been written, but haven't been deployed yet, so a lot of people failed at how to handle error in RxJS.
 
 So here is a simple work around on how to handle the error in RxJS:
 
@@ -40,13 +40,13 @@ So here is a simple work around on how to handle the error in RxJS:
 const errorHandler = catchError((err, resetStream) => {
   /**
    * Reporting the error, then return the fallback value if there's any.
-   * Finally reset the stream.
+   * Finally resume the stream.
    */
   return of(fallbackValue).pipe(concat(resetStream))
 })
 ```
 
-We can take the advantage of the technique. For example, when the ajax request failed, you can delay it for 5 minute before the request stream can be reset:
+We can take the advantage of the technique. For example, when an ajax request fails, you can delay it for 5 minute before the request stream can be reset:
 
 ```jsx
 const errorHandler = catchError((err, resetStream) => {
@@ -54,8 +54,8 @@ const errorHandler = catchError((err, resetStream) => {
 })
 ```
 
-However, I will say that even error handler can be failed and the line of handling error or not is blurry. So make sure that you added an error handler and not overthinking how handling error should works!
+However, I will say that even error handler can be failed and the line of handling error or is quite blurry sometimes. So make sure that you added an error handler and not overthinking how to handle the error!
 
 To top: [Table of Contents](Wiki.md)
 
-Next: [Store and More on Dependency Injection](StoreAndDI.md)
+Next: [About Store and Dependency Injection](StoreAndDI.md)

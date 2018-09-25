@@ -1,6 +1,6 @@
 # Add React Epic to React Counter App
 
-Counter App is the easiest app to demonstrate how state machine work. Here is one of its implementation:
+Counter App is the easiest app to demonstrate how state machine works. Here is one of its implementation:
 
 ```jsx
 export class CounterApp extends Component {
@@ -25,7 +25,7 @@ const decrease = state => state - 1
 const reset = () => 0
 ```
 
-So to lift the app logic up to the RxJS layer, here is how we do it:
+So to lift the app logic up to the RxJS and React DOM, here is how we do it:
 
 ```jsx
 export class CounterApp extends Component {
@@ -56,6 +56,8 @@ export class CounterApp extends Component {
   }
 }
 ```
+
+Note: There was one operator `lift`. Which i will discuss later on the Chapter of [Lift Behind the Scene](LiftBehindTheScene.md).
 
 Or you can even do it better:
 
@@ -104,7 +106,7 @@ export class CounterApp extends Component {
 
 ## Store and shared state
 
-What if you want to store the state app somewhere far. Where you can access it latter at any other place at any time?
+What if you want to store the state app somewhere far. Where you can access it later at any other place?
 
 Here is how we lift the state up to the store:
 
@@ -142,7 +144,7 @@ const counterEpic = ({
 And we bind the store and the app logic to the top of your app:
 
 ```jsx
-<Provider store={createStore} runEpics={[counterEpic]}>
+<Provider store={createStore()} runEpics={[counterEpic]}>
   <CounterApp />
 </Provider>
 ```
@@ -181,7 +183,7 @@ export class CounterApp extends Component {
 }
 ```
 
-That's it! This is a very Rapid Recipe of how we define a wonderful state machine Counter App using React, RxJS and React Epic.
+That's it! This is a very Rapid Recipe of how to add RxJS to your React App using React Epic.
 
 For more information on how to Handling Error go to next Chapter: [Handling Error](HandlingError.md)
 
