@@ -70,7 +70,11 @@ Redux is not bad at all. Actually, i have hated Redux before but now i love it. 
 
 The problems come to Redux is first, it cannot lift the side-effects into Redux itself. That why we need Redux Saga, Redux Observable, etc. The second problem come to Redux is that it is so expensive to encapsulate every single actions in your app logic. Sometimes, actions stream is only to report errors so it's unnecessary to encapsulate all of them.
 
-But you may miss Redux some day. So if you still love Redux, there're three solution to overcome this. The first as we said is to use library like Redux Observer, MobX, Redux Saga, etc, .... The second solution is to lift Redux into RxJS. The third solution (You can guess) is to lift RxJS into Redux. Can it be?!
+## Bridging between Redux and React Epic
+
+Redux is great at tooling. So if you love to Redux with RxJS, i have three solutions for you. The first is as we said, we can use libraries like Redux Observer, MobX, Redux Saga, etc, .... That's probably what you don't want me to talk about here!
+
+The second solution is to lift RxJS into Redux. How can it be?!
 
 The answer is yes. Imagine this is the reducer and how it swallows the actions stream:
 
@@ -108,7 +112,7 @@ return (
 )
 ```
 
-The second way, is to lift Redux into RxJS. Actually, i have prepared a bridge between React Epic and Redux (For people who love Redux tooling):
+So you may come up with the third way. Is to lift Redux into RxJS. Actually, i have prepared a bridge between React Epic and Redux for you:
 
 ```jsx
 function createEpicStore() {
@@ -131,12 +135,28 @@ const reduxEpics = ({ store, addTodos$, refetchSuccessful$ }) => merge(
 ).subscribe(action => store.dispatch(action))
 
 /**
- * This one is a litte bit trickier
+ * This one is a litte bit tricky
  */
 const mapStateToProps = ({ store }) => createState(store, ({ todos }) => ({ todos }))
+
+/**
+ * Or it can be even more trickier. You can bind the store states
+ * directly into React Epic Store
+ */
+function createEpicStore() {
+  const store = createStore() // Create Redux Store
+
+  return {
+    store,
+    /**
+     * But remember this states are Observables, not Subjects
+     */
+    ...createState(store, ({ todos }) => ({ todos }))
+  }
+}
 ```
 
-Or if you have another subscribe system:
+If you have another subscription system:
 
 ```jsx
 const mapStateToProps = ({ store }) =>
@@ -149,7 +169,9 @@ const mapStateToProps = ({ store }) =>
   )
 ```
 
-That's it. That's how Redux inside RxJS should be. Remember, we got another example of how a reducer like in React Epic:
+It should work the same way with Redux Observable and React Redux does.
+
+That's it. That's how Redux works inside React Epic. Remember, we got another version of how a reducer likes in React Epic:
 
 ```jsx
 lift(state$, action$, (state, action) => newState).subscribe(

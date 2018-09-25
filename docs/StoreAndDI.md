@@ -154,7 +154,7 @@ function createStore() {
 }
 ```
 
-The above two way we can use injected stores internally inside one epic without having to make an alternative shared epic to another store but there's one defect: That is your store will be tangled.
+The above two way we can use injected stores internally inside one epic without having to make an alternative shared epic to another store but there's only one ceveat: That is your store will be tangled.
 
 ```jsx
 /**

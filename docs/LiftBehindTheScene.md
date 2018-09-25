@@ -30,7 +30,7 @@ function lift(func) {
 
 I know, the second lift is so miraculous. But it can not against the fact that the second is the correct one for my situation. You may question me why.
 
-The fact is both of the lift function has their point of view about how a lifted function should be. To take a look closer, let consider an example of three arguments functions.
+The fact is both of the lift functions have their point of view about how a lifted function should be. To take a look closer, let consider an example of three arguments functions:
 
 ```jsx
 function lift(func) {
@@ -70,7 +70,7 @@ todos$
 
 People usually tends to be tricked into the ideal that this is a loop. But it doesn't.
 
-I will tell you something. The change doesn't result in emitting values. In another word, it tell the stream that arg1 and arg2 has changed but does not emit values. The real stream emits values comes from arg3. That why i consider `switchMap` is static and `map` is dynamic.
+I will tell you something. The change doesn't result in emitting values. In another word, it tell the stream that arg1 and arg2 has changed but does not emit values. The real stream that emits values comes from arg3. That why i consider `switchMap` is static and `map` is dynamic.
 
 So why does this important. If you notice, the above pattern of `todos` and `addTodo` will stretch across all other state machine pattern. What is the state machine pattern formally? And if you have another notice, why we have two nesting `switchMap` in the three argument example?
 
@@ -87,7 +87,7 @@ function lift(func) {
 }
 ```
 
-If you notice, we don't care how many nesting `switchMap` are there, the final result will only depend on the last argument. The same think work with `map` (You can have multiple nested `map` either). So how to compact it? It's easy:
+If you notice, we don't care how many nesting `switchMap` are there, the final result will only depend on the last argument. The same think works with `map` (You can have multiple nested `map` either). So how to compact it? It's easy:
 
 ```jsx
 combineLatest(arg1$, arg2$).pipe(
@@ -121,7 +121,7 @@ function lift(reducer) {
 }
 ```
 
-Huh, what the heck! Your eyes are not blur and you are seeing what i'm showing you is another reducer?! 🤔 Does it reminds you of Redux? Are you missing something? The fact is that all application implementations consist of two things: the app own state and the external actions (or outer event space). The fact, it's not remind me of Redux but Haskell State. I have had a hard time taking deep investigation into Haskell State and don't understand anything about how it works and why it even exists! Then i come up with one diagram that helps me a bit about understading it:
+Huh, what the heck! This sounds familiar! 🤔 Does it reminds you of Redux? Are you missing something? The fact is that all application implementations consist of two things: the app own state and the external actions (or outer event space). The fact, it's not remind me of Redux but Haskell State. I have had a hard time taking deep investigation into Haskell State and don't understand anything about how it works and why it even exists! Then i come up with one diagram that helps me a bit about understading it:
 
 ```md
                    -> state1
@@ -154,46 +154,19 @@ do
   pure (todos)
 ```
 
-Actually you will see i embedded state and action arguments into lift arguments somewhere. Someone might love this, someone might hate this because it breaks the semantic meaning of lift operator. But i still take it because it is my decide choice (And i live with it). It is the rare case that your operator don't stick with your target of your state and your action. And reusing such this kind of operators might be troublesome that lead to the misconception that: They all the same. So for example one may edit this operator for convenient but don't know that it might break other functions. Reusing it is not hard, you already had the operator by the way. There's two ways to overcome this. The first is to relift the operator
+Actually you will see i embedded state and action arguments into lift for convenient somewhere in my document. The real meaning of these is an operator always comes with an event source and i want to lift the operator into RxJS Subject than a noraml RxJS operator. If you wonder, the lift function is smart so that writing the lift function in the both ways are valid:
 
 ```jsx
 lift(state$, action$, operator)
+
+const RxJSOperator = lift(operator)
 ```
 
-The second way is to wrap it so that the other ones know what are they doing and you know what are you doing, too:
-
-```jsx
-function liftedOperator(state$, action$) {
-  return lift(state$, action$, operator)
-}
-```
-
-It can be cleaner but troublesome if you rewrite the following way all the times:
-
-```jsx
-lift(operator)(state$, action$).subscribe(state$)
-```
-
-Like:
-
-```jsx
-lift(operator(state$, action$)).subscribe(state$)
-```
-
-And the truth is you usually rewrite it all the times. Each time for each epic, than to lift an operator for once and use it across epics. Fun fact: The first one is still very additive to me because it is good in semantic so i leave both ways valid! 🤣
-
-- The good: I leave you defind your own way of how to use it.
-- The bad: You may come up with unecessary performance impact.
-- The ugly: This might lead to inconsistency implementation of your app.
-
-Best of both world:
-
-- Using `lift(state$, action$, operator)` in almost all of your epic.
-- Only using `const liftedOperator = lift(func)` when necessary.
+There's only one caveat is this might lead to the inconsistency of your source code. So the best recommendation is to use the embedded version all the time and only use the original semantic version when necessary.
 
 ## More on State and Actions
 
-"Don't use lift if you don't really know what it does". Just kidding, we have so far discuss and use `lift` so frequent in our document but our app still looks good and works like a charm. But what i wanna tell you is different. What i want to tell you is not whether your app works fine or not, but how much you understand about the architecture **behind the scene** of the lift operator **behind your app**. For example:
+"Don't use lift operator if you don't really know what it does". Just kidding, we have so far discuss and use `lift` so frequent in our document but our app still looks good and works like a charm. But what i wanna tell you is different. What i want to tell you is not whether your app works fine or not, but how much you understand about the architecture **behind the scene** of the lift operator **behind your app**. For example:
 
 ```jsx
 const clock$ = interval(1000)
@@ -226,8 +199,6 @@ So that you know how the interval function works. It works by two things, the in
 currentClockCounter = initialCounterNumber + numberOfTicks
 ```
 
-And state may combine of states and actions may combine of actions. That's how your app still works good if you have a good design architecture. So you know what you are doing. Cheers! 🍻
+However, there will be much more complicated situations than this one so for more information about the hard cases in RxJS, please visit the next chapter: [Execution Context in RxJS](RxJSExecutionContext.md).
 
 To top: [Table of Contents](Wiki.md)
-
-Next Chapter: [Execution Context in RxJS](RxJSExecutionContext.md)
