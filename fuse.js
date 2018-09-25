@@ -1,9 +1,13 @@
-const { FuseBox, BabelPlugin } = require('fuse-box')
+const {
+  FuseBox,
+  BabelPlugin,
+  QuantumPlugin
+} = require('fuse-box')
 const { context, task, src, exec } = require('fuse-box/sparky')
 
 context(
   class FuseContext {
-    getConfig(options) {
+    getConfig(options = {}) {
       return FuseBox.init({
         homeDir: 'src',
         output: 'dist/$name.js',
@@ -41,29 +45,49 @@ task('clean', async context => {
 })
 
 task('build:node', async context => {
-  /**
-   * @type {FuseBox}
-   */
-  const fuseDefault = context.getConfig({
+  const fuse = context.getConfig({
     target: 'server@esnext',
+    globals: {
+      default: '*'
+    },
     tsConfig: [
       {
         compilerOptions: {
+          module: 'commonjs',
           allowSyntheticDefaultImports: true
         }
       }
+    ],
+    plugins: [
+      BabelPlugin({
+        config: {
+          presets: ['env', 'stage-2', 'react'],
+          plugins: [
+            [
+              'transform-decorators-legacy',
+              {
+                legacy: true
+              }
+            ],
+            'transform-class-properties',
+            'transform-runtime'
+          ]
+        }
+      }),
+      QuantumPlugin({
+        target: 'npm',
+        bakeApiIntoBundle: 'react-epic',
+        containedAPI: true
+      })
     ]
   })
 
-  fuseDefault.bundle('react-epic').instructions(`> index.js`)
-  await fuseDefault.run()
+  fuse.bundle('react-epic').instructions(`> [index.js]`)
+  await fuse.run()
 })
 
 task('build:umd', async context => {
-  /**
-   * @type {FuseBox}
-   */
-  const fuseUMD = context.getConfig({
+  const fuse = context.getConfig({
     target: 'browser@esnext',
     globals: {
       default: 'reactEpic'
@@ -78,6 +102,6 @@ task('build:umd', async context => {
     ]
   })
 
-  fuseUMD.bundle('react-epic.umd').instructions(`> index.js`)
-  await fuseUMD.run()
+  fuse.bundle('react-epic.umd').instructions(`> [index.js]`)
+  await fuse.run()
 })

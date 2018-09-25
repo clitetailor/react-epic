@@ -1,4 +1,5 @@
 import { combineSubscriptions } from './combineSubscriptions'
+import { isFunction } from './isFunction'
 
 /**
  * Combine an object of epics into one subscription. For example:
