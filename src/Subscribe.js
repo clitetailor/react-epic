@@ -1,6 +1,7 @@
 import { Component, Children } from 'react'
 import { Subject } from 'rxjs'
-import { switchMap } from 'rxjs/operators'
+import { switchMap, distinctUntilChanged } from 'rxjs/operators'
+import { makeHotWithLastItem } from './makeHot'
 
 export function createSubscribe() {
   class Subscribe extends Component {
@@ -20,7 +21,16 @@ export function createSubscribe() {
 
     componentDidMount() {
       this.subscription = this.observerListener
-        .pipe(switchMap(observer => observer))
+        .pipe(
+          switchMap(observer => makeHotWithLastItem(observer)),
+          /**
+           * Provide some sort of memorisation.
+           *
+           * TODO: Providing options for enhanced memorisation on
+           * `<Subscribe />`
+           */
+          distinctUntilChanged()
+        )
         .subscribe(this.onStateChange)
 
       this.observerListener.next(this.props.observer)
@@ -48,7 +58,8 @@ export function createSubscribe() {
         ? this.props.children(
             this.state.childProps,
             /**
-             * This actually solve the problem of passing context around.
+             * This actually solve the problem of passing context params
+             * around.
              */
             ...args
           )
@@ -66,7 +77,7 @@ export function createSubscribe() {
       if (this.props.observer !== prevProps.observer) {
         /**
          * Remember change in observer may not trigger onStateChange.
-         * Hint: Only observer contains values does.
+         * Hint: Only observer contains new values does.
          */
         this.observerListener.next(nextProps.observer)
       }

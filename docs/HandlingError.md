@@ -56,6 +56,6 @@ const errorHandler = catchError((err, resetStream) => {
 
 However, I will say that even error handler can be failed and the line of handling error or is quite blurry sometimes. So make sure that you added an error handler and not overthinking how to handle the error!
 
-To top: [Table of Contents](Wiki.md)
+Next Chapter: [Common Mistakes](CommonMistakes.md)
 
-Next: [About Store and Dependency Injection](StoreAndDI.md)
+To top: [Table of Contents](Wiki.md)

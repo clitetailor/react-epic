@@ -8,7 +8,7 @@ const refetchTodos = () => ajax.get('/todos')
 
 Another example i want to tell about the meaning of execution context is when you open a new tab, your execution context will be that new tab. But when you open a new modal on that new tab, so every streams on that new tab should be blocked and wait for streams on that modal to be completed before it can be resumed. How do we stimulate this model in RxJS?
 
-let me tell you a story. Recently i registered to an Algorithmic class and the teacher told us about one problem. That is when we represent the solution to a problem, we often forget to show clearly about the inputs and the outputs of that problem. But sadly these such these bunch of mistakes we meet all the time. So i come back with the problem and this time i come up with a list of inputs and outputs. The inputs of the problems are a list of streams that we want to disable and enable, a stream of opening events and a stream of closing events on modal. So that is how we stimulate the execution context. The way we disable and enable a stream is to use `takeWhile`. Unhappily, there's no short implemetation for this kind of problem (I checked RxJS issues and only see workarounds. It seems like they don't want to make any other unnecessary implementation of this operator). So here is a workaround:
+Let me tell you a story. Recently i registered to an Algorithmic class and the teacher told us about one problem. That is when we represent the solution to a problem, we often forget to show clearly about the inputs and the outputs of that problem. But sadly these such these bunch of mistakes we meet all the time. So i come back with the problem and this time i come up with a list of inputs and outputs. The inputs of the problem are a list of streams that we want to disable and enable, a stream of opening events and a stream of closing events on modal. So that is how we stimulate the execution context. The way we disable and enable a stream is to use `takeWhile`. Unhappily, there's no short implemetation for this kind of problem (I checked RxJS issues and only see workarounds. It seems like they don't want to make any other unnecessary implementation of this operator). So here is a workaround:
 
 ```jsx
 const toggleStream = merge(
@@ -113,6 +113,6 @@ export App extends Component {
 
 So i make a hard decision here is to keep the old `WithRx` implementation so that it can let us move forward with the use of `<Subscribe />`
 
-Next Chapter: [Math and Implemetation behind ReactiveX](Math.md)
+Next Chapter: [Cascading Problem in React Epic](CascadingUpdate.md)
 
 To top: [Table of Contents](Wiki.md)

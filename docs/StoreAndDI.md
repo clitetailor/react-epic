@@ -201,3 +201,5 @@ That's some kind of brain twisted. 🤔
 The fourth version i haven't come up with so contributions are welcome! 😄
 
 Next: [React Epic Breakdown Cookbook](BreakdownCookbook.md)
+
+To top: [Table of Contents](Wiki.md)

@@ -25,7 +25,7 @@ const refreshTodos = () => refetchTodos().then(setState)
 
 The pure counter app works fine because it don't contain any logic that need side-effects to take place. And when side-effects come in type of streams, that when you need RxJS.
 
-You might think, why don't we just do something in the pure computational logic first and then subscribe from RxJS later. Actually that's what i'm thinking. Like, if your component is pure. So let it be pure. And where you need to app process side-effects you subscribe to the effects later.
+You might think, why don't we just do something in the pure computational logic first and then subscribe from RxJS later. Actually that's what i'm thinking. Like, if your component is pure. So let it be pure. And where you need to app processes side-effects you subscribe to the effects later.
 
 For example, the `<TodoList />` logic is pure. But when the todos need to contains some side-effect logics. It would be something like this:
 
@@ -181,6 +181,6 @@ lift(state$, action$, (state, action) => newState).subscribe(
 
 So be clear and thoughtful, just don't be overwhelming (That would probably what we don't want you to be). Enjoy! 😄
 
-To top: [Table of Contents](Wiki.md)
-
 Next Chapter: [Lift Behind the Scene](LiftBehindTheScene.md)
+
+To top: [Table of Contents](Wiki.md)
