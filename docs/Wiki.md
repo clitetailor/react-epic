@@ -14,3 +14,4 @@ Welcome to React Epic Wiki! 💖
 - [React Epic Breakdown Cookbook](BreakdownCookbook.md)
 - [Lift Behind the Scene](LiftBehindTheScene.md)
 - [Execution Context in RxJS](RxJSExecutionContext.md)
+- [Math and Implemetation behind ReactiveX](Math.md)

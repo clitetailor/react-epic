@@ -113,6 +113,6 @@ export App extends Component {
 
 So i make a hard decision here is to keep the old `WithRx` implementation so that it can let us move forward with the use of `<Subscribe />`
 
-To top: [Table of Contents](Wiki.md)
+Next Chapter: [Math and Implemetation behind ReactiveX](Math.md)
 
-Or: [Go back to Home Page](../README.md)
+To top: [Table of Contents](Wiki.md)

@@ -123,7 +123,7 @@ function lift(reducer) {
 
 Huh, what the heck! This sounds familiar! 🤔 Does it reminds you of Redux? Are you missing something? The fact is that all application implementations consist of two things: the app own state and the external actions (or outer event space). The fact, it's not remind me of Redux but Haskell State. I have had a hard time taking deep investigation into Haskell State and don't understand anything about how it works and why it even exists! Then i come up with one diagram that helps me a bit about understading it:
 
-```md
+```
                    -> state1
 runState --->     /          \
                  /            v
@@ -187,9 +187,9 @@ function reducer(state = initialState, action) {
 
 So here we come up with a formular of what state really is:
 
-```md
+```
 state = initialState + action + action + ... + action
-                      \-------------v---------------/
+                      \-------------v----------------/
                             a list of actions
 ```
 
