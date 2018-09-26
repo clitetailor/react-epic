@@ -16,7 +16,8 @@ A = {any type}
 D = {duration type}
 Time = {time type}
 E = {event type or execution return code type}
-F = {function types}
+F = {general function type}
+Number = {number type}
 [] = {collection type}
 
 Rx: T -> T
@@ -49,7 +50,13 @@ delay = (rx0, d0) ->
   return rx1
 
 throttle: DO
-throttle = {quite long to implement}
+throttle = {quite long to implement. re-distribute emit values over timeline}
+
+interval: D -> Rx(Number)
+interval = d0 ->
+  map([0, 1, ...], n0 -> (n0, d0))
+  # Need some kind of lazy evaluation behind Haskell
+  # This is why `seq` break the sematic behind Haskell
 
 time: () -> Time
 time = {get and return the current time value}
