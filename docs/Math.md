@@ -40,7 +40,7 @@ console.log = (x0) ->
 of: forall(X -> (X -> Rx(X)))
 of = x0 -> [(x0, 0)]
 
-DO = {duration operation type} =
+DO = {duration operator type} =
   forall(X -> (Rx(X) . D -> Rx(X)))
 
 delay: DO
@@ -105,7 +105,7 @@ Ofcourse paradox is just ... paradox. Time works different way with numbers. Or 
 | True       |    +     |    -     |
 | False      |    -     |    +     |
 
-You can pick either one of the following strategy:
+You can pick either one of the following strategies:
 
 - Store the previous actions in memories, reduce the clock when `setTimeout` second param is negative, replay the actions in the correct order.
 - Remove the action.
