@@ -25,6 +25,9 @@ Rx = t0 -> [t0 . D]
 
 # [A . D] is exactly Rx type. It is a collection of tuples. Each contains a value and a duration. When a stream is subscribed, it schedules to emit values based on the caculated durations. 
 
+# Actually it would be much more clean if i rewrite it like this:
+# Rx = t0 -> [{ value: t0, duration: D }]
+
 # Function to generate generic types
 forall: (T -> T) -> T
 forall = f0 ->
