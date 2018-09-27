@@ -2,7 +2,7 @@
 
 ## Using merge the wrong way
 
-This is one of my bad nightmare with RxJS:
+This is one of my bad nightmare with RxJS (which might cause even error handler to be failed on debugging):
 
 ```jsx
 merge([stream1, stream2]) // Wrong

@@ -113,6 +113,6 @@ export App extends Component {
 
 So i make a hard decision here is to keep the old `WithRx` implementation so that it can let us move forward with the use of `<Subscribe />`
 
-Next Chapter: [Cascading Problem in React Epic](CascadingUpdate.md)
+Next Chapter: [Throttling And Buffering](ThrottlingAndBuffering.md)
 
 To top: [Table of Contents](Wiki.md)

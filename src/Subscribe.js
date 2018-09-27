@@ -1,7 +1,7 @@
 import { Component, Children } from 'react'
 import { Subject } from 'rxjs'
 import { switchMap, distinctUntilChanged } from 'rxjs/operators'
-import { makeHotWithLastItem } from './makeHot'
+import { makeBehaviorHot } from './makeHot'
 
 export function createSubscribe() {
   class Subscribe extends Component {
@@ -22,11 +22,13 @@ export function createSubscribe() {
     componentDidMount() {
       this.subscription = this.observerListener
         .pipe(
-          switchMap(observer => makeHotWithLastItem(observer)),
+          switchMap(observer =>
+            observer.pipe(makeBehaviorHot())
+          ),
           /**
-           * Provide some sort of memorisation.
+           * Provide some sort of memoization.
            *
-           * TODO: Providing options for enhanced memorisation on
+           * TODO: Providing options for enhanced memoization on
            * `<Subscribe />`
            */
           distinctUntilChanged()

@@ -70,6 +70,8 @@ Redux is not bad at all. Actually, i have hated Redux before but now i love it. 
 
 The problems come to Redux is first, it cannot lift the side-effects into Redux itself. That why we need Redux Saga, Redux Observable, etc. The second problem come to Redux is that it is so expensive to encapsulate every single actions in your app logic. Sometimes, actions stream is only to report errors so it's unnecessary to encapsulate all of them.
 
+<div id="ReduxBridging"></div>
+
 ## Bridging between Redux and React Epic
 
 Redux is great at tooling. So if you love to Redux with RxJS, i have three solutions for you. The first is as we said, we can use libraries like Redux Observer, MobX, Redux Saga, etc, .... That's probably what you don't want me to talk about here!

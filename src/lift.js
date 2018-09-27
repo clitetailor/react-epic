@@ -1,4 +1,5 @@
 import { switchMap, map } from 'rxjs/operators'
+import { makeBehaviorHot } from './makeHot'
 
 /**
  * Lift an operator (aka a reducer) into computational RxJS space. The
@@ -29,7 +30,13 @@ export function lift(state$, action$, func) {
 
   return state$.pipe(
     switchMap(state =>
-      action$.pipe(map(action => func(state, action)))
+      action$.pipe(
+        /**
+         * Actions should be made to be hot for optimization.
+         */
+        makeBehaviorHot(),
+        map(action => func(state, action))
+      )
     )
   )
 }

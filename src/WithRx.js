@@ -126,44 +126,34 @@ export function WithRx(
         this.state = {
           childProps: this.props
         }
-
-        this.subscribeFromContext = this.subscribeFromContext.bind(
-          this
-        )
-        this.subscribeFromObserver = this.subscribeFromObserver.bind(
-          this
-        )
       }
 
       render() {
-        return createElement(
-          Consumer,
-          null,
-          this.subscribeFromContext
+        return <Consumer>{this.renderContext}</Consumer>
+      }
+
+      renderContext = context => {
+        return (
+          <Subscribe
+            initialState={defaultValue || initialState}
+            preload={preload}
+            observer={bindState(mapStateToProps(context))}
+            args={context}
+          >
+            {this.renderObserver}
+          </Subscribe>
         )
       }
 
-      subscribeFromContext(context) {
-        return createElement(
-          Subscribe,
-          {
-            initialState: defaultValue || initialState,
-            preload,
-            observer: bindState(mapStateToProps(context)),
-            args: [context]
-          },
-          this.subscribeFromObserver
-        )
-      }
-
-      subscribeFromObserver(storeState, context) {
-        return createElement(
-          WrappedComponent,
-          mergeProps(
-            storeState,
-            bindActions(mapActionsToProps(context)),
-            this.props
-          )
+      renderObserver = (storeState, context) => {
+        return (
+          <WrappedComponent
+            {...mergeProps(
+              storeState,
+              bindActions(mapActionsToProps(context)),
+              this.props
+            )}
+          />
         )
       }
     }
