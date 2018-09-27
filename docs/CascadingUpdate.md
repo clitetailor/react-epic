@@ -61,7 +61,7 @@ if (
 }
 ```
 
-But the fact is this might never happen, because the `initialState` that you provide to `<Subscribe />` and the `initialState` you provide for the Store are often two different instances (for convinient). So we may need a deep compare check instead. And this addition check only slowing the render process. So i removed the condition check.
+But the fact is this might never happen, because the `initialState` that you provide to `<Subscribe />` and the `initialState` you provide for the Store are often two different instances (for convenient). So we may need a deep compare check instead. And this addition check only slowing the render process. So i removed the condition check.
 
 The solution to remove the first emit item from store (using `BehaviorSubject`) can be the right solution. That means the first rendering will always display the `initialState` instead of the first state from store. That means you always have to have the `initialState` (this is actually a good choice because it greater support SEO). But it turns out that the `componentDidMount` and cascade `setState` only happens before DOMContentLoaded. So it is okey if you don't use initialState and provide it with default `BehaviorSubject`. But this might lead the misconception of warnings or any potential bug in your app. (`componentDidUpdate` is called in very rare cases when the observer is changed so we only concentrate on the problem with `componentDidMount`). Actually if you disable JS in website so nothing will be displayed. We may need ReactDOMServer and i don't know whether they have some sort of DOMContentLoaded event.
 
