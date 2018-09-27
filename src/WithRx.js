@@ -1,4 +1,4 @@
-import { Component, createContext, createElement } from 'react'
+import React, { createContext } from 'react'
 import { Subscription } from 'rxjs'
 import hoistStatics from 'hoist-non-react-statics'
 
@@ -10,7 +10,7 @@ import { isFunction } from './isFunction'
 
 const { Provider: ContextProvider, Consumer } = createContext()
 
-export class Provider extends Component {
+export class Provider extends React.Component {
   constructor(props) {
     super(props)
 
@@ -36,12 +36,10 @@ export class Provider extends Component {
   }
 
   render() {
-    return createElement(
-      ContextProvider,
-      {
-        value: this.props.store
-      },
-      this.props.children
+    return (
+      <ContextProvider value={this.props.store}>
+        {this.props.children}
+      </ContextProvider>
     )
   }
 
@@ -119,7 +117,7 @@ export function WithRx(
   } = withRxOptions
 
   return function wrappedWithRx(WrappedComponent) {
-    class RxWrapper extends Component {
+    class RxWrapper extends React.Component {
       constructor(props) {
         super(props)
 
@@ -138,7 +136,7 @@ export function WithRx(
             initialState={defaultValue || initialState}
             preload={preload}
             observer={bindState(mapStateToProps(context))}
-            args={context}
+            args={[context]}
           >
             {this.renderObserver}
           </Subscribe>
@@ -158,6 +156,6 @@ export function WithRx(
       }
     }
 
-    return RxWrapper
+    return hoistStatics(RxWrapper, WrappedComponent)
   }
 }

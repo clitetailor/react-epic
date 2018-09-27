@@ -1,7 +1,15 @@
-import { BehaviorSubject } from 'rxjs'
+import { Subject, Observable } from 'rxjs'
+import { finalize, takeLast } from 'rxjs/operators'
+
+export function takeLastFromCold(cold) {
+  return cold.pipe(
+    finalize(),
+    takeLast()
+  )
+}
 
 /**
- * Working around over RxJS `publishBehavior` and `multicast` operators.
+ * Working around over RxJS `publish` and `multicast` operators.
  * For example, the following lines should not log anything:
  *
  * ```js
@@ -10,22 +18,25 @@ import { BehaviorSubject } from 'rxjs'
  *
  * ```
  */
-export function makeBehaviorHot() {
+export function makeHot() {
   return cold => {
-    const proxy = new BehaviorSubject()
+    const proxy = new Subject(undefined)
 
     let coldSub
-
     let refs = 0
     return new Observable(observer => {
       /**
-       * Ưhen there's a new subscription. If no hot sub is created. This
-       * subscribe for hot items from cold stream.
+       * When there's a new subscription. If no hot sub is created then
+       * the the cold sub will be created. This allow app to resume from
+       * closed.
        */
       if (refs === 0) {
+        /**
+         * Evaluate all the previous items to make cold stream hot.
+         */
         coldSub = cold.subscribe(proxy)
       }
-      refs++
+      ++refs
 
       /**
        * Subject only emits items come after subscription. Every
@@ -36,20 +47,34 @@ export function makeBehaviorHot() {
        */
       const hotSub = proxy.subscribe(observer)
 
+      /**
+       * Don't forget to take the last item from cold stream.
+       */
+      takeLastFromCold(cold).subscribe(observer)
+
+      let connected = true
+
       return () => {
         /**
-         * When a subscription is teardown, its hotSub is teared-down too.
+         * Check whether the subscription has been teardown before.
          */
-        hotSub.unsubscribe()
+        if (connected === true) {
+          --refs
+          connected = false
+          /**
+           * When a subscription is teardown, its hotSub is teared-down
+           * too.
+           */
+          hotSub.unsubscribe()
 
-        refs--
-        /**
-         * When there's no more subscriptions then the `coldSub` can be
-         * teared-down too.
-         */
-        if (refs === 0) {
-          coldSub.unsubscribe()
-          coldSub = null
+          /**
+           * When there's no more subscriptions then the `coldSub` can
+           * be teared-down too.
+           */
+          if (refs === 0) {
+            coldSub.unsubscribe()
+            coldSub = null
+          }
         }
       }
     })
