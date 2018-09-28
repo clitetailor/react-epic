@@ -17,4 +17,5 @@ Welcome to React Epic Wiki! 💖
 - [Lift Behind the Scene](LiftBehindTheScene.md)
 - [Execution Context in RxJS](RxJSExecutionContext.md)
 - [Throttling And Buffering](ThrottlingAndBuffering.md)
+  - [Sync Operator](SyncOperator.md)
 - [Cascading Problem in React Epic](CascadingUpdate.md)

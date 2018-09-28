@@ -13,21 +13,25 @@ actions.pipe(
 )
 ```
 
-Remember if you stream is not hot by default you may need to optimize your stream using `share`:
+Remember if you stream is not synced you may need to optimize your stream using `syncWithLast`:
 
 ```jsx
-actions.pipe(share())
+actions.pipe(syncWithLast())
 ```
+
+<div id="SyncOperator"></div>
+
+For more information about sync operator please visit: [Sync Operator](SyncOperator.md)
 
 And then `throttle` that stream for 5 seconds:
 
 ```jsx
 actions.pipe(
-  share()
+  syncWithLast()
   distinctUntilChange(),
   switchMap(a =>
     actions.pipe(
-      share(),
+      syncWithLast(),
       throttle(5000)
     )
   )

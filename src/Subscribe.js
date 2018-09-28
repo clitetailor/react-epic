@@ -1,7 +1,7 @@
 import React from 'react'
 import { Subject } from 'rxjs'
 import { switchMap, distinctUntilChanged } from 'rxjs/operators'
-import { makeHotWithLast } from './makeHot'
+import { syncWithLast } from './sync';
 
 export function createSubscribe() {
   class Subscribe extends React.Component {
@@ -23,7 +23,7 @@ export function createSubscribe() {
       this.subscription = this.observerListener
         .pipe(
           switchMap(observer =>
-            observer.pipe(makeHotWithLast())
+            observer.pipe(syncWithLast())
           ),
           /**
            * Provide some sort of memoization.

@@ -9,3 +9,4 @@ export {
 export { lift } from './lift'
 export { createAction } from './createAction'
 export { createState } from './createState'
+export { sync, syncAndReplay, syncWithLast } from './sync'
