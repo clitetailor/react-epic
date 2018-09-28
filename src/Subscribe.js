@@ -1,11 +1,7 @@
 import React from 'react'
 import { Subject } from 'rxjs'
-import {
-  switchMap,
-  distinctUntilChanged,
-  tap
-} from 'rxjs/operators'
-import { makeHot } from './makeHot'
+import { switchMap, distinctUntilChanged } from 'rxjs/operators'
+import { makeHotWithLast } from './makeHot'
 
 export function createSubscribe() {
   class Subscribe extends React.Component {
@@ -26,7 +22,9 @@ export function createSubscribe() {
     componentDidMount() {
       this.subscription = this.observerListener
         .pipe(
-          switchMap(observer => observer.pipe(makeHot())),
+          switchMap(observer =>
+            observer.pipe(makeHotWithLast())
+          ),
           /**
            * Provide some sort of memoization.
            *

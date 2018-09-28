@@ -1,12 +1,4 @@
-import { Subject, Observable } from 'rxjs'
-import { finalize, takeLast } from 'rxjs/operators'
-
-export function takeLastFromCold(cold) {
-  return cold.pipe(
-    finalize(),
-    takeLast()
-  )
-}
+import { Observable, ReplaySubject } from 'rxjs'
 
 /**
  * Working around over RxJS `publish` and `multicast` operators.
@@ -18,9 +10,9 @@ export function takeLastFromCold(cold) {
  *
  * ```
  */
-export function makeHot() {
+export function makeHotReplay(count) {
   return cold => {
-    const proxy = new Subject(undefined)
+    const proxy = new ReplaySubject(count)
 
     let coldSub
     let refs = 0
@@ -46,11 +38,6 @@ export function makeHot() {
        * not to make last item being duplicated.
        */
       const hotSub = proxy.subscribe(observer)
-
-      /**
-       * Don't forget to take the last item from cold stream.
-       */
-      takeLastFromCold(cold).subscribe(observer)
 
       let connected = true
 
@@ -79,4 +66,8 @@ export function makeHot() {
       }
     })
   }
+}
+
+export function makeHotWithLast() {
+  return makeHotReplay(1)
 }

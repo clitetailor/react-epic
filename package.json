@@ -4,7 +4,8 @@
   "description": "Featured Subscriber and HOC for React Components",
   "main": "dist/react-epic.js",
   "scripts": {
-    "build": "node fuse default",
+    "build": "node fuse build",
+    "watch": "node fuse watch",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

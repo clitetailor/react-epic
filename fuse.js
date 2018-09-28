@@ -3,7 +3,13 @@ const {
   BabelPlugin,
   QuantumPlugin
 } = require('fuse-box')
-const { context, task, src, exec } = require('fuse-box/sparky')
+const {
+  context,
+  task,
+  src,
+  exec,
+  watch
+} = require('fuse-box/sparky')
 
 context(
   class FuseContext {
@@ -34,8 +40,22 @@ context(
   }
 )
 
-task('default', async context => {
+task('build', async context => {
   await exec('clean', 'build:node', 'build:umd')
+})
+
+task('watch', async () => {
+  await exec('build')
+
+  await watch(
+    '**.js',
+    {
+      base: 'src'
+    },
+    () => {
+      exec('build')
+    }
+  ).exec()
 })
 
 task('clean', async context => {
