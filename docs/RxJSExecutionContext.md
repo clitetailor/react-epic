@@ -1,118 +1,183 @@
 # Execution Context in RxJS
 
+## The Problem
+
 Sometimes when you try to implement a simple ajax method, you might find yourself in a situation. You don't know how to register the ajax call correctly or whether to register it locally or globally:
 
 ```jsx
 const refetchTodos = () => ajax.get('/todos')
 ```
 
-Another example i want to tell about the meaning of execution context is when you open a new tab, your execution context will be that new tab. But when you open a new modal on that new tab, so every streams on that new tab should be blocked and wait for streams on that modal to be completed before it can be resumed. How do we stimulate this model in RxJS?
+## The Mechanical
 
-Let me tell you a story. Recently i registered to an Algorithmic class and the teacher told us about one problem. That is when we represent the solution to a problem, we often forget to show clearly about the inputs and the outputs of that problem. But sadly these such these bunch of mistakes we meet all the time. So i come back with the problem and this time i come up with a list of inputs and outputs. The inputs of the problem are a list of streams that we want to disable and enable, a stream of opening events and a stream of closing events on modal. So that is how we stimulate the execution context. The way we disable and enable a stream is to use `takeWhile`. Unhappily, there's no short implemetation for this kind of problem (I checked RxJS issues and only see workarounds. It seems like they don't want to make any other unnecessary implementation of this operator). So here is a workaround:
-
-```jsx
-const toggleStream = merge(
-  of(true),
-  // Pause the source stream on modal execution context.
-  openingModalStream.pipe(mapTo(false)),
-  // Resume the source stream when the modal is closed.
-  closingModalStream.pipe(mapTo(true))
-)
-
-const interceptedStream = toggleStream.pipe(
-    switchMap(toggle => source.pipe(
-      takeWhile(() => toggle)
-    ))
-  )
-)
-```
-
-As we have learned, the `switchMap` operator is static and the source stream is dynamic. The only thing that we wish for is to have a imperative version of this operator, what actually i can provide you:
+Before i show you how to apply the techique of Execution Context into RxJS. I will guild you to the mechanical of Execution Context using Function first. This is a small demonstration:
 
 ```jsx
-const toggle = (toggle$, initialValue) => source =>
-  merge(of(initialValue), toggle$).pipe(
-    switchMap(toggle => source.pipe(takeWhile(() => toggle)))
-  )
-```
-
-So that you can use it easily in one line:
-
-```jsx
-source.pipe(toggle(toggleStream, true))
-```
-
-However, the RxJS implemetation of operator is much more complex. They're trying to convert every n order logic functions of into OOP style i think (They have their reason behind this). Functional closure is quite complicated than OOP though.
-
-The first problem seems to be different. Given a local stream and a shared stream. The shared stream is throttle for 5 seconds. Everytime we click the button, we register the local stream to the shared stream. When the stream is accepted, the shared stream will notify the local stream to make an ajax to the server. So the implementation may look like this:
-
-```jsx
-const register$ = new Subject()
-register$
-  .pipe(throttle(5000))
-  .subscribe(subject => subject.next())
-
-const refetchTodos$ = new Subject()
-refetchTodos$
-  .pipe(switchMap(() => ajax.get('/todos')))
-  .subscribe(todos$)
-
-function register() {
-  register$.next(this.refetchTodo$)
+function first(input1, input2, input3, input4) {
+  // This is the execution context of the function first
 }
 ```
 
-## Only Relationship Matters
-
-You will think that there's a principal pattern here. Like what i have made with the reducer. There's no principal pattern in this case. The first example show the dependence of the source stream on the shared stream based on `throttle`. The second example shows the dependence of the parent execution context on its children execution context based on `takeWhile` relation. So the only relations between these two problems is the relations. It will be the principle on your design choice. Choosing this operator over another operator one problem is just the need of which kind of relationship you want to stimultate and how do you stimultate it.
-
-## Local Store doesn't Exists
-
-There was actually another problem that blocked me from the clarity is that how to unsubscribe the local stream at the local component. Actually as i have said we don't even need to unsubscribe the stream on `componentWillUnmount` due to the use of `<Subscribe />`. But the most of us usually being treated into the ideal of using HOC so it will do the rest stuffs for us and we can have a consistency implementation of the all components. Actually i can provide you with a HOC that provide the local state for you. But it's not worth. Here is the reason why:
-
-```js
-@WithRx2(localStore, runEpic, mapStateToProps, mapActionsToProps, mergeProps, initialStateOrPreload, ...blaBlaBla)
-```
-
-As you might see the api will look much more complicated. Especially, when you connect with a shared state. It seems to far more expensive than we already have now. So the greatest solution i think is to subscribe the relations manually and then manually unsubscribe it:
+I will call it the first-order function. You might have an ideal, what if you can put a execution context into another execution context:
 
 ```jsx
-export App extends Component {
-  state = {
-    intialState
-  }
-
-  state$ = new BehaviorSubject(this.state.initialState)
-
-  action$ = bindAction(new Subject)
-
-  componentDidMount() {
-    this.subscription = combineSubscriptions(
-      merge(
-        /* ... */
-      ).subscribe(this.state$)
-    )
-  }
-
-  render() {
-    return (
-      <Subscribe
-        observer={this.state$}
-        initialState={this.state.initialState}
-      >
-        {state => /* ... */}
-      </Subscribe>
-    )
-  }
-
-  componentWillUnmount() {
-    this.subscription.unsubscribe()
-  }
+function second(input1, input2, input3, input4) {
+  // This is the execution context of the second function
+  return first(input1, input2, input3, input4) // Execute the context
 }
 ```
 
-So i make a hard decision here is to keep the old `WithRx` implementation so that it can let us move forward with the use of `<Subscribe />`
+So how Function and RxJS can be similar to each other. Here is an example of how a function declaration looks like in RxJS:
 
-Next Chapter: [Throttling And Buffering](ThrottlingAndBuffering.md)
+```jsx
+combineLastest(input1$, input2$, input3$, input4$)
+  .pipe(...instructions)
+  .subscribe(output$)
+```
+
+But the way we make a function call is quite different. The function is called whenever one of its input is dispatched:
+
+```jsx
+input1$.next(value1)
+input2$.next(value2)
+```
+
+And the way they return is different too:
+
+```jsx
+subscribe(output$)
+
+subscribe(ouput => {
+  /* ... */
+})
+```
+
+One more thing you may need to know is how to make a nesting function call. First, you need to pass a function into another function:
+
+```jsx
+// Function style
+second(first)
+
+// RxJS style
+second$.next(first$)
+```
+
+And then we run it by calling it inside its wrapper:
+
+```jsx
+// Function style
+function second(first) {
+  first()
+}
+
+// RxJS style
+first$.subscribe(second$ => {
+  second$.next()
+})
+```
+
+## Examples
+
+One of the most important thing you need to know is how to apply Execution Context technique into your situation and how to do that. So in the first problem, it's very easy if you want to register the function locally:
+
+```jsx
+// Function declaration
+first$.pipe(mergeMap(() => ajax.get('/api'))).subscribe(state$)
+
+// Second is to make a function call
+first$.next(value)
+```
+
+So how do we register it globally. To describe the use case, here is a problem for example. If you want that every ajax call need to be throttled for 5 seconds before you can make a new ajax. You may do something like this:
+
+```jsx
+let processQueue = []
+
+function registerAjaxCall(ajax) {
+  processQueue.push({ ajax })
+}
+
+setInterval(() => {
+  if (processQueue.length) {
+    processQueue.shift()()
+  }
+})
+
+function getApi() {
+  ajax.getApi().then(output => {
+    /* ... */
+  })
+}
+```
+
+The same thing will work with RxJS:
+
+```jsx
+let queue = new Subject()
+queue.pipe(throttle(5000)).subscribe(ouput => output.next())
+
+let getApi = new Subject()
+getApi
+  .pipe(mergeMap(() => ajax.get('/api')))
+  .subscribe(output => {
+    /* ... */
+  })
+
+queue.next(getApi)
+```
+
+That is much more simpler!
+
+## Resource Coordination
+
+The above example is just one technique to lock down on resource. There's another example i can show you:
+
+```jsx
+function second(first) {
+  static lock = false
+  if (lock === false) {
+    lock = true
+    first()
+    lock = false
+  } else {
+    return
+  }
+
+  // Perform alternative tasks
+}
+```
+
+So that first is being called, second can not be called again until first release the resources. You know this might never happen in JS but this might happen in RxJS. For example, when you switch to a new tab, the context is now that tab. But when open the modal, you want that every events on the tab need to be locked until the modal is close. How do you stimulate that?
+
+The solution is to use `skipWhile` or `takeWhile` because it works the same way with `if`:
+
+```jsx
+let lock = false
+
+second.pipe(skipWhile(() => lock)).subscribe(first => {
+  lock = true
+  first.next()
+  lock = false
+})
+```
+
+For modal, you may have implementation can be more specific:
+
+```jsx
+const lock = merge(
+  openModal.pipe(mapTo(true)),
+  closeModal.pipe(mapTo(false))
+)
+
+lock
+  .pipe(
+    switchMap(_lock => tabEvent.pipe(skipWhile(() => _lock)))
+  )
+  .subscribe(_tabEvent => {
+    /* ... */
+  })
+```
+
+That's all about Execution Context. If you love our docs, prefer to give us a star or to go on to the next chapter: [Throttling And Buffering](ThrottlingAndBuffering.md)
 
 To top: [Table of Contents](Wiki.md)
