@@ -12,10 +12,10 @@ Welcome to React Epic Wiki! 💖
 - [Handling Error](HandlingError.md)
 - [Common Mistakes](CommonMistakes.md)
 - [Store and More on Dependency Injection](StoreAndDI.md)
-- [React Epic Breakdown Cookbook](BreakdownCookbook.md)
-  - [Bridging between Redux and React Epic](BreakdownCookbook.md#ReduxBridging)
+- [React Epic Breakdown Cookbook](BreakdownCookbook.md) [`experimental`]
+  - [Bridging between Redux and React Epic](BreakdownCookbook.md#ReduxBridging) [`advance technique`]
 - [Lift Behind the Scene](LiftBehindTheScene.md)
-- [Execution Context in RxJS](RxJSExecutionContext.md)
-- [Throttling And Buffering](ThrottlingAndBuffering.md)
-  - [Sync Operator](SyncOperator.md)
-- [Cascading Problem in React Epic](CascadingUpdate.md)
+- [Execution Context in RxJS](RxJSExecutionContext.md) [`advance technique`]
+- [Throttling And Buffering](ThrottlingAndBuffering.md) [`experimental`]
+  - [Sync Operator](SyncOperator.md) [`experimental`]
+- [Cascading Problem in React Epic](CascadingUpdate.md) [`experimental`]

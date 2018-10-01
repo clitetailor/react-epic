@@ -200,6 +200,8 @@ That's some kind of brain twisted. 🤔
 
 The fourth version i haven't come up with so contributions are welcome! 😄
 
+Bonus: If you need some advance tools to work with deep nesting state, consider using [Reselect](https://github.com/reduxjs/reselect)
+
 Next: [React Epic Breakdown Cookbook](BreakdownCookbook.md)
 
 To top: [Table of Contents](Wiki.md)

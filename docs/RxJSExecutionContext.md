@@ -1,14 +1,14 @@
 # Execution Context in RxJS
 
-## The Problem
-
 Sometimes when you try to implement a simple ajax method, you might find yourself in a situation. You don't know how to register the ajax call correctly or whether to register it locally or globally:
 
 ```jsx
 const refetchTodos = () => ajax.get('/todos')
 ```
 
-## The Mechanical
+In this chapter, We will show you about the technique and how to use it efficently.
+
+## The Mechanism
 
 Before i show you how to apply the techique of Execution Context into RxJS. I will guild you to the mechanical of Execution Context using Function first. This is a small demonstration:
 
@@ -71,8 +71,8 @@ function second(first) {
 }
 
 // RxJS style
-first$.subscribe(second$ => {
-  second$.next()
+second$.subscribe(first$ => {
+  first$.next()
 })
 ```
 
@@ -94,27 +94,29 @@ So how do we register it globally. To describe the use case, here is a problem f
 let processQueue = []
 
 function registerAjaxCall(ajax) {
-  processQueue.push({ ajax })
+  processQueue.push(ajax)
 }
 
 setInterval(() => {
   if (processQueue.length) {
     processQueue.shift()()
   }
-})
+}, 5000)
 
 function getApi() {
   ajax.getApi().then(output => {
     /* ... */
   })
 }
+
+registerAjaxCall(getApi)
 ```
 
 The same thing will work with RxJS:
 
 ```jsx
 let queue = new Subject()
-queue.pipe(throttle(5000)).subscribe(ouput => output.next())
+queue.pipe(throttle(5000)).subscribe(output => output.next())
 
 let getApi = new Subject()
 getApi
@@ -147,7 +149,7 @@ function second(first) {
 }
 ```
 
-So that first is being called, second can not be called again until first release the resources. You know this might never happen in JS but this might happen in RxJS. For example, when you switch to a new tab, the context is now that tab. But when open the modal, you want that every events on the tab need to be locked until the modal is close. How do you stimulate that?
+So that when the `first` is being called, the `second` can not be called again (recursive call for example) until the `first` release the resources. You know this might never happen in JS but this might happen in RxJS. For example, when you switch to a new tab, the context is now on that tab. But when open the modal, you want that every events on the tab need to be locked until the modal is close. How do you stimulate that?
 
 The solution is to use `skipWhile` or `takeWhile` because it works the same way with `if`:
 
@@ -161,7 +163,7 @@ second.pipe(skipWhile(() => lock)).subscribe(first => {
 })
 ```
 
-For modal, you may have implementation can be more specific:
+For the modal example, your implementation can be more specific:
 
 ```jsx
 const lock = merge(

@@ -32,18 +32,20 @@ Our example, Tada ... :
 ```jsx
 const todos$ = new BehaviorSubject([])
 
-todos$.pipe(
-  switchMap(todos => addTodo$.pipe(
-    map(newTodo => todos.concat([newTodo]))
-  ))
-).subscribe(todos$)
+lift(
+  todos$,
+  addTodo$,
+  (todos, newTodo) => todos.concat([newTodo])
+).subcribe(todo$)
 
-/* ... */
+refetchTodos$.pipe(
+  mergeMap(() => ajax.get('/todos'))
+).subscribe(todo$)
 
-@WithRx({
-  mapStateToProps: ({ todos$ }) => ({ todos: todos$ }),
-  mapActionsToProps: ({ addTodo$ }) => ({ addTodo: addTodo$ })
-})
+@WithRx(
+  ({ todos$ }) => ({ todos: todos$ }),
+  ({ addTodo$, refetchTodos$ }) => ({ addTodo: addTodo$, refetchTodos: refetchTodos$ })
+)
 export class Todos extends Component { ... }
 ```
 
