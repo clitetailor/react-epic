@@ -1,14 +1,37 @@
+import { isObservable } from 'rxjs'
+
 import { isFunction } from './isFunction'
+import { noop } from './noop'
 
 export function bindActions(actions, ...args) {
+  const keys = Object.keys(actions)
+
+  for (const key of keys) {
+    const action = actions[key]
+    if (!isFunction(action) && !isObservable(action)) {
+      console.warn(
+        `Invalid value ${action} for action ${key}. An action need to be either a Function or an Observable.`
+      )
+    }
+  }
+
   return Object.assign(
-    Object.keys(actions).reduce(
-      (all, name) =>
-        Object.assign(all, {
-          [name]: bindAction(actions[name])
-        }),
-      {}
-    ),
+    keys
+      .filter(key => {
+        const action = actions[key]
+
+        if (isFunction(action) || isObservable(action)) {
+          return true
+        }
+        return false
+      })
+      .reduce(
+        (all, name) =>
+          Object.assign(all, {
+            [name]: bindAction(actions[name])
+          }),
+        {}
+      ),
     ...args
   )
 }
@@ -34,5 +57,14 @@ export function bindAction(action) {
      */
     return action
   }
-  return action.next.bind(action)
+
+  if (isObservable(action)) {
+    return action.next.bind(action)
+  }
+
+  console.warn(
+    `Action ${action} need to be a Function or an Observable`
+  )
+
+  return noop
 }
