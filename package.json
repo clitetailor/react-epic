@@ -1,15 +1,46 @@
 {
   "name": "react-epic",
   "version": "0.0.1",
-  "description": "Make React components Reactive Again!",
-  "main": "index.js",
+  "description": "Featured Subscriber and HOC for React Components",
+  "main": "dist/react-epic.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node fuse build",
+    "watch": "node fuse watch",
+    "help": "node fuse help",
+    "test": "mocha test/**/*.test.js --opts mocha.opts"
   },
   "keywords": [
     "rxjs",
     "react"
   ],
   "author": "clitetailor <ducnhatphung@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "core-js": "^2.5.7",
+    "hoist-non-react-statics": "^3.0.1",
+    "invariant": "^2.2.4",
+    "prop-types": "^15.6.2",
+    "react": "^16.5.2",
+    "rxjs": "^6.3.2",
+    "typescript": "^3.0.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-decorators-legacy": "^1.3.5",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "babel-runtime": "^6.26.0",
+    "chai": "^4.2.0",
+    "enzyme": "^3.6.0",
+    "enzyme-adapter-react-16": "^1.5.0",
+    "fuse-box": "^3.5.0",
+    "jsdom": "^12.1.0",
+    "mocha": "^5.2.0",
+    "react-dom": "^16.5.2",
+    "sinon": "^6.3.4"
+  }
 }

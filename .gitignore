@@ -1,2 +1,9 @@
-/node_modules
+.fusebox
+.cache
+dist
+node_modules
+
 shrinkwrap.yaml
+
+# TSConfig can be generated automatically from FuseBox
+tsconfig.json
