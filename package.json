@@ -7,7 +7,8 @@
     "build": "node fuse build",
     "watch": "node fuse watch",
     "help": "node fuse help",
-    "test": "mocha test/**/*.test.js --opts mocha.opts"
+    "test": "mocha test/**/*.test.js --opts mocha.opts",
+    "nyc": "nyc npm test"
   },
   "keywords": [
     "rxjs",
@@ -40,7 +41,9 @@
     "fuse-box": "^3.5.0",
     "jsdom": "^12.1.0",
     "mocha": "^5.2.0",
+    "nyc": "^13.0.1",
     "react-dom": "^16.5.2",
+    "redux": "^4.0.0",
     "sinon": "^6.3.4"
   }
 }
