@@ -125,50 +125,42 @@ function createEpicStore() {
   }
 }
 
-const reduxEpics = ({ store, addTodos$, refetchSuccessful$ }) => merge(
-  createAction(addTodos$, action => {
-    type: 'ADD_TODO',
-    payload: action
-  }),
-  createAction(refetchSuccesful$, action => {
-    type: 'RESET_TODOS',
-    payload: action
-  })
-).subscribe(action => store.dispatch(action))
+const reduxEpics = ({ store, addTodos$, refetchSuccessful$ }) =>
+  merge(
+    createAction(addTodos$, payload => {
+      type: 'ADD_TODO', payload
+    }),
+    createAction(refetchSuccesful$, payload => {
+      type: 'RESET_TODOS', payload
+    })
+  ).subscribe(action => store.dispatch(action))
 
 /**
  * This one is a litte bit tricky
  */
-const mapStateToProps = ({ store }) => createState(store, ({ todos }) => ({ todos }))
+const mapStateToProps = ({ store }) => ({
+  todos: from(store).pluck('todos')
+})
 
 /**
  * Or it can be even more trickier. You can bind the store states
  * directly into React Epic Store
  */
+import { from } from 'rxjs'
+
 function createEpicStore() {
   const store = createStore() // Create Redux Store
+  const store$ = from(store)
 
   return {
     store,
     /**
-     * But remember this states are Observables, not Subjects
+     * But remember this states are Observables, not Subjects. If you
+     * want to update state, you have to do it via action.
      */
-    ...createState(store, ({ todos }) => ({ todos }))
+    todos$: store$.pipe(pluck('todos'))
   }
 }
-```
-
-If you have another subscription system:
-
-```jsx
-const mapStateToProps = ({ store }) =>
-  createState(
-    new Observable(observer => {
-      store.onChange(observer.next.bind(observer))
-      store.onComplete(observer.complete.bind(observer))
-    }),
-    ({ todos }) => ({ todos })
-  )
 ```
 
 It should work the same way with Redux Observable and React Redux does.

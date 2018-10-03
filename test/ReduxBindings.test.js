@@ -12,6 +12,29 @@ describe('ReduxBindings', () => {
     it('should bind to Redux correctly', () => {
       const clickCounts = Array.from({ length: 3 }, (v, k) => k)
 
+      function createEpicStore(store) {
+        const store$ = from(store)
+
+        return {
+          counter: store$.pipe(pluck('counter')),
+          increase: new Subject(),
+          decrease: new Subject(),
+          reset: new Subject(),
+          store
+        }
+      }
+
+      const counterEpic = ({ store, increase, decrease }) => {
+        return merge(
+          createAction(increase, () => ({
+            type: 'INCREMENT'
+          })),
+          createAction(decrease, () => ({
+            type: 'DECREMENT'
+          }))
+        ).subscribe(action => store.dispatch(action))
+      }
+
       clickCounts.map(clickCount => {
         function counter({ counter = 0 } = {}, action) {
           switch (action.type) {
@@ -27,31 +50,9 @@ describe('ReduxBindings', () => {
         }
 
         const store = createStore(counter)
-        const store$ = from(store)
-
-        function createEpicStore() {
-          return {
-            counter: store$.pipe(pluck('counter')),
-            increase: new Subject(),
-            decrease: new Subject(),
-            reset: new Subject(),
-            store
-          }
-        }
-
-        const counterEpic = ({ store, increase, decrease }) => {
-          return merge(
-            createAction(increase, () => ({
-              type: 'INCREMENT'
-            })),
-            createAction(decrease, () => ({
-              type: 'DECREMENT'
-            }))
-          ).subscribe(action => store.dispatch(action))
-        }
 
         const wrapper = createMountPoint(
-          createEpicStore(),
+          createEpicStore(store),
           counterEpic
         )
 

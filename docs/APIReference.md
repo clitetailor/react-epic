@@ -27,7 +27,6 @@ React Epic provides two ways to subscribe to a stream: By either using `<Subscri
 
 ### Redux Binding
 
-- createState
 - createAction
 
 To top: [Table of Contents](Wiki.md)
