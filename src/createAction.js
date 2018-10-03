@@ -1,3 +1,5 @@
+import { map } from 'rxjs/operators'
+
 /**
  * Bridging between React Epic and Redux.
  *
@@ -15,7 +17,7 @@
  *
  * ```
  */
-function createAction(action$, func, dispatch) {
+export function createAction(action$, func, dispatch) {
   if (!dispatch) {
     return action$.pipe(map(func))
   }

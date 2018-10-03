@@ -66,7 +66,7 @@ describe('WithRx', () => {
         counterEpic
       )
 
-      const increaseCount = 1000
+      const increaseCount = 100
       const increaseButton = wrapper.find('#increase')
       const counterNode = wrapper.find('#counter')
 
