@@ -1,6 +1,6 @@
 # Add React Epic to React Counter App
 
-First, to understand how React Epic works. I will tell you to forget everything about React, got a blank mind and start to think. In a pure logic, this is how we define a state machine work:
+First, to understand how React Epic works. I will tell you to forget everything about React, got a blank mind first then start to think. In a pure logic, this is how we define a state machine work:
 
 ```jsx
 let counter = 0
@@ -10,29 +10,60 @@ let decrease = (state, action = 1) => state - action
 let reset = (state, action) => 0
 ```
 
-But this program cannot run because it doesn't have anything to bind with. The easiest way is to bind to the console:
+But this program cannot run because it doesn't have anything to bind with it. The easiest way is to bind to the console:
 
 ```jsx
-function render() {
-  console.log(counter)
-}
+function bind(state, reducers) {
+  function render() {
+    console.log(state)
+  }
 
-function setState(func) {
-  counter = func(counter)
-  render(counter)
+  function setState(func) {
+    state = func(state)
+    render(state)
+  }
+
+  const ui = Object.keys(reducers).reduce(
+    (all, name) =>
+      Object.assign(all, {
+        [name](action) {
+          setState(state => reducers[name](state, action))
+        }
+      }),
+    {}
+  )
+
+  return ui
 }
 ```
 
 So when we run the program, it will log out the result:
 
 ```jsx
-setState(counter => increase(counter)) // Output: 1
-setState(counter => increase(counter)) // Output: 2
-setState(counter => decrease(counter)) // Output: 1
-setState(counter => reset(counter)) // Output: 0
+const ui = bind(counter, {
+  increase,
+  decrease,
+  reset
+})
+
+ui.increase(2) // Output: 2
+ui.decrease(1) // Output: 1
+ui.reset() // Output: 0
 ```
 
-But then you will find this is not enough. For example, when you call an ajax. Can you put an ajax into `setState`. Yes, you can, but this seems not very attractive. You need something more consistency than this. So we come up with another solution: RxJS
+But then you will find this is not enough. For example, when you call an ajax. How can you put an ajax into `setState`?
+
+```jsx
+const todos = []
+const refetch = () => fetch('/todos')
+
+// Shoule we?!
+const ui = bind(todos, {
+  refetch
+})
+```
+
+Of course, we can but this seems to not very attractive, there will be some cases that you cannot cover if using **thunk** only. You need something more consistency and powerful than this. So we come up with another solution: RxJS
 
 ```jsx
 let counter$ = new BehaviorSubject(0)
@@ -45,6 +76,8 @@ let reset = new Subject()
 To make it easier for you to bind pure logic into RxJS, i provide you with a lift operator. The following lines will demonstrate how it works:
 
 ```jsx
+import { lift } from 'react-epic'
+
 lift(
   state$,
   action$,
@@ -57,12 +90,16 @@ So the `increase`, `decrease`, `reset` functions will be declare like this:
 ```jsx
 import { lift } from 'react-epic'
 
-lift(counter$, increase$, counter => counter + 1).subscribe(
-  counter$
-)
-lift(counter$, decrease$, counter => counter - 1).subscribe(
-  counter$
-)
+lift(
+  counter$,
+  increase$,
+  (counter, value) => counter + value
+).subscribe(counter$)
+lift(
+  counter$,
+  decrease$,
+  (counter, value) => counter - value
+).subscribe(counter$)
 lift(counter$, reset$, () => 0).subscribe(counter$)
 ```
 
@@ -87,9 +124,8 @@ counter$.subscribe(counter => console.log(counter))
 And how we call the `setState`:
 
 ```jsx
-increase$.next() // Output: 1
-increase$.next() // Output: 2
-decrease$.next() // Output: 1
+increase$.next(2) // Output: 2
+decrease$.next(1) // Output: 1
 reset$.next() // Output: 0
 ```
 
@@ -98,7 +134,7 @@ Reference:
 - For more information about how to use the lift operator, consider reading: [Lift Operator](LiftOperator.md)
 - For more information about how to declare a function and make a function call in RxJS, consider reading: [Exection Context in RxJS](RxJSExecutionContext.md)
 
-After this. You may wonder, how do we subscribe it from ReactDOM? The most easy way is:
+After this, you may wonder how do we subscribe the values from ReactDOM? The most easy way is:
 
 ```jsx
 import { Subscribe } from 'react-epic'
@@ -106,7 +142,7 @@ import { Subscribe } from 'react-epic'
 render() {
   return (
     <Subscribe observer={this.counter$}>
-      {counter => /* ... */}
+      {counter => <p>{counter}</p>}
     </Subscribe>
   )
 }

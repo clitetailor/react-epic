@@ -6,12 +6,13 @@ Welcome to React Epic Wiki! 💖
 
 ### Getting Started
 
-- [Add React Epic to React Counter App](CounterExample.md)
-- [Quick API Review](APIReview.md)
+- [Add React Epic to React Counter App](CounterApp.md)
+- [Quick API Review](APIOverview.md)
 - [API Reference](APIReference.md)
   - [Components](APIReference.md#Components)
   - [Decorators](APIReference.md#Decorators)
   - [Functions](APIReference.md#Functions)
+- [Pure Logic and Side Effects](SideEffects.md)
 - [Handling Error](HandlingError.md)
 - [Common Mistakes](CommonMistakes.md)
 
@@ -29,4 +30,4 @@ Welcome to React Epic Wiki! 💖
 
 ### Advance
 
-- [Cascading Problem in React Epic](CascadingUpdate.md) `experimental`
+- [Cascading Problem in React Epic](CascadingUpdate.md)
