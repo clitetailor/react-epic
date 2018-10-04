@@ -6,8 +6,8 @@ The fact is if there is any of your stream breakdown with an error, the whole sy
 function divide(a, b) {
   if (b === 0) {
     /**
-     * Just for example. Which might return Infinity in reality for
-     * the sake of JS god.
+     * Just in context of this example. Which might return Infinity in
+     * reality for the sake of JS god.
      */
     throw new Error('Division by Zero')
   }
@@ -43,7 +43,7 @@ In the above example, everything is fine. Except, the stream will be suspended a
 return of(err)
 ```
 
-without understanding how it works. By that way, you replace the current stream with a stream of the error object you handle. That's why the stream will be freezed after you handle the first error. At the time i write this post, the document about RxJS `catchError` operator already been written, but haven't been deployed yet, so a lot of people failed at how to handle error in RxJS.
+without understanding how it works. By that way, you replace the current stream with a stream of the error object you handle. That's why the stream will be freezed after you handle the first error.
 
 So here is a simple work around on how to handle the error in RxJS:
 

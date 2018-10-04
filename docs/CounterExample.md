@@ -1,127 +1,133 @@
 # Add React Epic to React Counter App
 
-Counter App is the easiest app to demonstrate how state machine works. Here is one of its implementation:
-
-```jsx
-export class CounterApp extends Component {
-  state = {
-    counter: 0
-  }
-
-  increase = () =>
-    this.setState({ counter: this.state.counter + 1 })
-
-  // ...
-}
-```
-
-If you notice, the app logic is much more simpler:
+First, to understand how React Epic works. I will tell you to forget everything about React, got a blank mind and start to think. In a pure logic, this is how we define a state machine work:
 
 ```jsx
 let counter = 0
 
-const increase = state => state + 1
-const decrease = state => state - 1
-const reset = () => 0
+let increase = (state, action = 1) => state + action
+let decrease = (state, action = 1) => state - action
+let reset = (state, action) => 0
 ```
 
-So to lift the app logic up to the RxJS and React DOM, here is how we do it:
+But this program cannot run because it doesn't have anything to bind with. The easiest way is to bind to the console:
 
 ```jsx
-export class CounterApp extends Component {
-  counter$ = new BehaviorSubject(0)
+function render() {
+  console.log(counter)
+}
 
-  increase$ = new Subject()
-  decrease$ = new Subject()
-  reset$ = new Subject()
-
-  componentDidMount() {
-    this.subscription = combineSubscriptions([
-      lift(
-        this.counter$,
-        this.increase$,
-        counter => counter + 1
-      ).subscribe(this.counter$),
-      lift(
-        this.counter$,
-        this.decrease$,
-        counter => counter - 1
-      ).subscribe(this.counter$),
-      this.reset$.pipe(mapTo(0)).subscribe(this.counter$)
-    ])
-  }
-
-  componentWillUnmount() {
-    this.subscription.unsubscribe()
-  }
+function setState(func) {
+  counter = func(counter)
+  render(counter)
 }
 ```
 
-Note: There was one operator `lift`. Which i will discuss later on the Chapter of [Lift Behind the Scene](LiftBehindTheScene.md).
-
-Or you can even do it better:
+So when we run the program, it will log out the result:
 
 ```jsx
-  componentDidMount() {
-    this.subscription = merge(
-      lift(
-        this.counter$,
-        this.increase$,
-        counter => counter + 1
-      ),
-      lift(
-        this.counter$,
-        this.decrease$,
-        counter => counter - 1
-      ),
-      this.reset$.pipe(mapTo(0))
-    ).subscribe(this.counter$)
-  }
+setState(counter => increase(counter)) // Output: 1
+setState(counter => increase(counter)) // Output: 2
+setState(counter => decrease(counter)) // Output: 1
+setState(counter => reset(counter)) // Output: 0
 ```
 
-And here is how we bind it back to React DOM:
+But then you will find it is not enough. For example, when you call an ajax. Can you put an ajax into `setState`. So we come up with another solution: RxJS
 
 ```jsx
-export class CounterApp extends Component {
-  state = {
-    counter: 0
-  }
+let counter$ = new BehaviorSubject(0)
 
-  increase = bindAction(this.increase$)
-  decrease = bindAction(this.decrease$)
-  reset = bindAction(this.reset)
+let increase$ = new Subject()
+let decrease$ = new Subject()
+let reset = new Subject()
+```
 
-  render() {
-    return (
-      <Subscribe
-        observer={bindState({ counter: this.counter$ })}
-        intialState={this.state}
-      >
-        {({ counter }) => ...}
-      </Subscribe>
-    )
-  }
+To make it easier for you to bind pure logic into RxJS, i provide you with a lift operator. The following lines will demonstrate how it works:
+
+```jsx
+lift(
+  state$,
+  action$,
+  (state, action) => state + action
+).subscribe(state$)
+```
+
+So the `increase`, `decrease`, `reset` functions will be declare like this:
+
+```jsx
+import { lift } from 'react-epic'
+
+lift(counter$, increase$, counter => counter + 1).subscribe(
+  counter$
+)
+lift(counter$, decrease$, counter => counter - 1).subscribe(
+  counter$
+)
+lift(counter$, reset$, () => 0).subscribe(counter$)
+```
+
+If you're familiar with RxJS, you can even do it better:
+
+```jsx
+import { merge, mapTo } from 'rxjs'
+
+merge(
+  lift(counter$, increase$, counter => counter + 1),
+  lift(counter$, increase$, counter => counter - 1),
+  reset.pipe(mapTo(0))
+).subscribe(counter$)
+```
+
+Here is how we define the `render` function:
+
+```jsx
+counter$.subscribe(counter => console.log(counter))
+```
+
+And how we call the `setState`:
+
+```jsx
+increase$.next() // Output: 1
+increase$.next() // Output: 2
+decrease$.next() // Output: 1
+reset$.next() // Output: 0
+```
+
+Reference:
+
+- For more information about how to use lift, consider reading: [Lift Operator](LiftBehindTheScene.md)
+- For more information about how to declare a function and make a function call in RxJS, consider reading: [Exection Context in RxJS](RxJSExecutionContext.md)
+
+After this. You may wonder, how do we subscribe it from ReactDOM? The most easy way is:
+
+```jsx
+import { Subscribe } from 'react-epic'
+
+render() {
+  return (
+    <Subscribe observer={this.counter$}>
+      {counter => /* ... */}
+    </Subscribe>
+  )
 }
 ```
 
-## Store and shared state
+## Store and DI
 
-What if you want to store the state app somewhere far. Where you can access it later at any other place?
+In the most cases you will only need to put the logic at the same place and then connect it with your component using HOC.
 
-Here is how we lift the state up to the store:
+To do that, first we need to create the store.
 
 ```jsx
-function createStore() {
-  return {
-    counter$: new BehaviorSubject(0),
-    increase$: new Subject(),
-    decrease$: new Subject(),
-    reset$: new Subject()
-  }
+const store = {
+  counter$: new BehaviorSubject(0),
+  increase$: new Subject(),
+  decrease$: new Subject(),
+  reset$: new Subject()
 }
 ```
 
-And here is how we define the app logic:
+And then define the app logic:
 
 ```jsx
 const counterEpic = ({
@@ -134,59 +140,39 @@ const counterEpic = ({
     lift(counter$, increase$, counter => counter + 1),
     lift(counter$, decrease$, counter => counter - 1),
     reset$.pipe(mapTo(0))
-  )
-    .pipe(
-      catchError(err, caught) => caught // Don't forget to handle error
-    )
-    .subscribe(counter$)
+  ).subscribe(counter$)
 ```
 
-And we bind the store and the app logic to the top of your app:
+Create a provider for your whole app:
 
 ```jsx
-<Provider store={createStore()} runEpics={[counterEpic]}>
-  <CounterApp />
+<Provider store={store} runEpic={counterEpic}>
+  <AppRoot />
 </Provider>
 ```
 
-And you can inject whatever you like:
+To connect your component you need to use `WithRx`:
 
 ```jsx
-@WithRx({
-  mapStateToProps: state => ({ counter: state.counter$ }),
-  mapActionsToProps: actions => ({
-    increase: actions.increase$,
-    decrease: actions.decrease$,
-    reset: actions.reset
+@WithRx(
+  ({ counter$ }) => ({ counter: counter$ }),
+  ({ increase$, decrease$, reset$ }) => ({
+    increase: increase$,
+    decrease: decrease$,
+    reset: reset$
   })
-})
-export class CounterApp extends Component {
+)
+export class CounterComponent extends React.Component {
   render() {
     const { counter, increase, decrease, reset } = this.props
-    // ...
+    return (
+      <div>
+        <p>{counter}</p>
+        <button onClick={increase}>Increase</button>
+        <button onClick={decrease}>Decrease</button>
+        <button onClick={reset}>Reset</button>
+      </div>
+    )
   }
 }
 ```
-
-Or you can inject and bind it yourself:
-
-```jsx
-@Inject(({ counter$, increase$, decrease$, reset$ }) => ({
-  counter$,
-  increase$,
-  decrease$,
-  reset$
-}))
-export class CounterApp extends Component {
-  counter$ = this.props.counter$
-  // ...
-}
-```
-
-That's it! This is a very Rapid Recipe of how to add RxJS to your React App using React Epic.
-
-For more information on how to Handling Error go to next Chapter: [Handling Error](HandlingError.md)
-
-To top: [Table of Contents](Wiki.md)
-
-Or you can jump to [React Epic Breakdown Cookbook](BreakdownCookbook.md)
