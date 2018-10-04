@@ -1,8 +1,8 @@
-# Lift Behind the Scene
+# Lift Operator
 
 After several chapters of Getting Started and React Epic in Action, you might wonder why there's another chapter on what the `lift` function is and how it works.
 
-The fact that we have discussed and use `lift` operator so frequent that we haven't have chance to take a look back and breakdown on what `lift` operator really is. So here is how we start:
+The fact that we have discussed and use `lift` operator so frequent that we haven't have chance to breakdown on `lift` operator. So here is how we start:
 
 My first ideal of the `lift` function is simple, is to create a function for lifting the pure logic functions into RxJS. So i come up with two functions without actually knowing clearly how it works:
 
@@ -56,7 +56,7 @@ function lift(func) {
 
 What is the different between `combineLatest` and the combination of `switchMap` and `map`. Why we only run `map` on the last argument?
 
-So i take more time investigate deeper into the effect of these three functions and the result is fantasy. `combineLatest` will emit everytime any of these arguments emits a value. So i will consider it's fully dynamic. What about `switchMap` and `map`? I consider `switchMap` is static and `map` is dynamic. This may a little bit tricky against the fact that `switchMap` changes everytime its argument emits a value. Consider the following example:
+So i take more time investigate deeper into the effect of these three functions and the result is fantasy. `combineLatest` will emit everytime any of its arguments emits a value. So i will consider, it's fully dynamic. What about `switchMap` and `map`? I consider `switchMap` is static and `map` is dynamic. This may a little bit tricky against the fact that `switchMap` changes everytime its argument emits a value. Consider the following example:
 
 ```jsx
 todos$
@@ -70,7 +70,7 @@ todos$
 
 People usually tends to be tricked into the ideal that this is a loop. But it doesn't.
 
-I will tell you something. The change doesn't result in emitting values. In another word, it tell the stream that arg1 and arg2 has changed but does not emit values. The real stream that emits values comes from arg3. That why i consider `switchMap` is static and `map` is dynamic.
+I will tell you something. The change doesn't result in emitting values. In another word, it only tell the core stream that arg1 and arg2 has changed and switch the stream based these two value, but does not emit any value at all. The real stream that emits values is the stream come from arg3. That why i consider `switchMap` is static and `map` is dynamic.
 
 So why does this important. If you notice, the above pattern of `todos` and `addTodo` will stretch across all other state machine pattern. What is the state machine pattern formally? And if you have another notice, why we have two nesting `switchMap` in the three argument example?
 
@@ -87,7 +87,7 @@ function lift(func) {
 }
 ```
 
-If you notice, we don't care how many nesting `switchMap` are there, the final result will only depend on the last argument. The same think works with `map` (You can have multiple nested `map` either). So how to compact it? It's easy:
+If you notice, we don't care how many nesting `switchMap` are there, the final result will only depend on the last argument. The same think works with `map` (You can have multiple nested `map` or `mergeMap` either). So how to compact its form? It's easy:
 
 ```jsx
 combineLatest(arg1$, arg2$).pipe(
@@ -154,12 +154,23 @@ do
   pure (todos)
 ```
 
-Actually you will see i embedded state and action arguments into lift for convenient somewhere in my document. The real meaning of these is an operator always comes with an event source and i want to lift the operator into RxJS Subject than a noraml RxJS operator. If you wonder, the lift function is smart so that writing the lift function in the both ways are valid:
+Actually you will see i embedded state and action arguments into the lift operator for convenient:
 
 ```jsx
-lift(state$, action$, operator)
+lift(state$, action$, (state, action) => state + action)
 
-const RxJSOperator = lift(operator)
+// Instead of
+
+let liftedOperator = lift((state, action) => state + action)
+liftedOperator(state$, action$)
+```
+
+The real meaning of this decision is that an operator usually being attached with a state source and an event source. So the result will be a RxJS Observable other than a lifted RxJS operator. If you wonder, the lift function is smart, so that writing the lift function in the both ways are valid:
+
+```jsx
+lift(state$, action$, operator) // Return an Observable
+
+const RxJSOperator = lift(operator) // Return a lifted operator
 ```
 
 There's only one caveat is this might lead to the inconsistency of your source code. So the best recommendation is to use the embedded version all the time and only use the original semantic version when necessary.
@@ -200,5 +211,3 @@ currentClockCounter = initialCounterNumber + numberOfTicks
 ```
 
 However, there will be much more complicated situations than this one so for more information about the hard cases in RxJS, please visit the next chapter: [Execution Context in RxJS](RxJSExecutionContext.md).
-
-To top: [Table of Contents](Wiki.md)

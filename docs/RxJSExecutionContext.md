@@ -23,7 +23,7 @@ I will call it the first-order function. You might have an ideal, what if you ca
 ```jsx
 function second(input1, input2, input3, input4) {
   // This is the execution context of the second function
-  return first(input1, input2, input3, input4) // Execute the context
+  return first(input1, input2, input3, input4) // Execute another context
 }
 ```
 
@@ -104,7 +104,7 @@ setInterval(() => {
 }, 5000)
 
 function getApi() {
-  ajax.getApi().then(output => {
+  ajax.get('/api').then(output => {
     /* ... */
   })
 }
@@ -149,7 +149,7 @@ function second(first) {
 }
 ```
 
-So that when the `first` is being called, the `second` can not be called again (recursive call for example) until the `first` release the resources. You know this might never happen in JS but this might happen in RxJS. For example, when you switch to a new tab, the context is now on that tab. But when open the modal, you want that every events on the tab need to be locked until the modal is close. How do you stimulate that?
+So that when the `first` is being called, the `second` can not be called again (recursive call for example) until the `first` release the resources. You know this might never happen in JS but this might happen in RxJS. For example, when you switch to a new tab, the context now is that new tab. But when open the modal, you want that every events on the tab need to be locked until the modal is closed. How do you stimulate that model?
 
 The solution is to use `skipWhile` or `takeWhile` because it works the same way with `if`:
 
@@ -179,7 +179,3 @@ lock
     /* ... */
   })
 ```
-
-That's all about Execution Context. If you love our docs, prefer to give us a star or to go on to the next chapter: [Throttling And Buffering](ThrottlingAndBuffering.md)
-
-To top: [Table of Contents](Wiki.md)

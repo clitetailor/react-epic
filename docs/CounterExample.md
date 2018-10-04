@@ -32,7 +32,7 @@ setState(counter => decrease(counter)) // Output: 1
 setState(counter => reset(counter)) // Output: 0
 ```
 
-But then you will find it is not enough. For example, when you call an ajax. Can you put an ajax into `setState`. So we come up with another solution: RxJS
+But then you will find this is not enough. For example, when you call an ajax. Can you put an ajax into `setState`. Yes, you can, but this seems not very attractive. You need something more consistency than this. So we come up with another solution: RxJS
 
 ```jsx
 let counter$ = new BehaviorSubject(0)
@@ -95,7 +95,7 @@ reset$.next() // Output: 0
 
 Reference:
 
-- For more information about how to use lift, consider reading: [Lift Operator](LiftBehindTheScene.md)
+- For more information about how to use the lift operator, consider reading: [Lift Operator](LiftOperator.md)
 - For more information about how to declare a function and make a function call in RxJS, consider reading: [Exection Context in RxJS](RxJSExecutionContext.md)
 
 After this. You may wonder, how do we subscribe it from ReactDOM? The most easy way is:
@@ -151,7 +151,7 @@ Create a provider for your whole app:
 </Provider>
 ```
 
-To connect your component you need to use `WithRx`:
+And then connect with the component using `WithRx`:
 
 ```jsx
 @WithRx(

@@ -19,7 +19,7 @@ Welcome to React Epic Wiki! 💖
 
 - [Store and More on Dependency Injection](StoreAndDI.md)
 - [Bridging between Redux and React Epic](ReduxBindings.md)
-- [Lift Behind the Scene](LiftBehindTheScene.md)
+- [Lift Operator](LiftOperator.md)
 
 ### Techniques
 
