@@ -18,6 +18,10 @@ combineSubscriptions([sub1, sub2])
 
 So i provide you with the fallback API so that you can use it the both way to make it consistency.
 
+```jsx
+combineSubscriptions(sub1, sub2)
+```
+
 ## Null Pointer Exception
 
 You might think that it is ok if you don't use either `initialState` or `preload` param. The fact that's in most of you cases the state is flat so you may not experience this kind of effects. But it might be a great problem if you have deep nesting states. So Null Pointer Exception is no exception in your app. Remember to always check Null Pointer Exception or to use ESNext Proposal Optional Chaining Operator for convenient.

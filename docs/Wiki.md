@@ -24,7 +24,7 @@ Welcome to React Epic Wiki! 💖
 
 ### Techniques
 
-- [Execution Context in RxJS](RxJSExecutionContext.md)
+- [Execution Context in RxJS](ExecutionContext.md)
 - [Throttling And Buffering](ThrottlingAndBuffering.md) `experimental`
   - [Sync Operator](SyncOperator.md) `experimental`
 
