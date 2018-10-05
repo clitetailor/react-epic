@@ -130,6 +130,10 @@ queue.next(getApi)
 
 That is much more simpler!
 
+## The different between Function and RxJS
+
+The different between Function and RxJS is that with a Function, you can call it anywhere you need and anytime you want. If you don't need it, you can just call another function. With RxJS, you call it once on event streams but it will run all the time. The pros is that you only need to trigger changes on one event source and the effect of the function will be rerun throughout the whole app. The cons is that you are now unlikely to change thing in imperative way but to write in a more declarative way.
+
 ## Resource Coordination
 
 The above example is just one technique to lock down on resource. There's another example i can show you:

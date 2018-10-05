@@ -141,3 +141,13 @@ const counterEpic = ({ counter$, increase$ }) =>
 ```
 
 However, integrating Redux is still addictive to me.
+
+## The different between React Epic and Redux
+
+React Epic and Redux work so much the same way. In Redux, you encapsulate all actions into objects and push all pure logics into reducers. Side-effects can be performed by using middlewares.
+
+In React Epic, it works the same way. You encapsulate every action into an event stream. Both the pure logics and the side-effects can be translated into RxJS and handle in RxJS. Or you can seperate the pure logics into the UI and handle side-effects only with RxJS.
+
+The cons of Redux is that because everything is encapsulated into an object so it is easy to profiling the data and navigating between versions of history. The cons is that it can be overloaded if you try to put everything and run everything at the same place. A lot of actions need to be encapsulated and state need to be computed a lot, too.
+
+The pros of using RxJS is that you have the ultilities of RxJS operators and it's almost adequate in common problems. The cons is that it's not always easy to translate a function into RxJS style. It can be frustration to re-translate pure logic into RxJS, too. Running everything as stream is hard to debug especially if you unfortunately have done something wrong in RxJS without aware of it.
