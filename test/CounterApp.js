@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { mount, shallow } from 'enzyme'
 
 import { WithRx, Provider } from '../src/WithRx'
-import { noop } from './utils/constants'
+import { noop } from '../src/noop'
 
 @WithRx(
   ({ counter }) => ({ counter }),

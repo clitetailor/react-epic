@@ -1,7 +1,7 @@
 import React from 'react'
 import { Subject } from 'rxjs'
 import { switchMap, distinctUntilChanged } from 'rxjs/operators'
-import { syncWithLast } from './sync';
+import { syncWithLast } from './sync'
 
 export function createSubscribe() {
   class Subscribe extends React.Component {
@@ -22,9 +22,7 @@ export function createSubscribe() {
     componentDidMount() {
       this.subscription = this.observerListener
         .pipe(
-          switchMap(observer =>
-            observer.pipe(syncWithLast())
-          ),
+          switchMap(observer => observer.pipe(syncWithLast())),
           /**
            * Provide some sort of memoization.
            *
@@ -55,24 +53,26 @@ export function createSubscribe() {
      * https://reactjs.org/docs/render-props.html#using-props-other-than-render
      */
     render() {
-      const args = this.props.args || []
-      return this.state.loaded
-        ? this.props.children(
-            this.state.childProps,
+      const {
+        preload,
+        children,
+        defaultValue = {},
+        initialState = defaultValue, // Some people may prefer initialState
+        ...rest
+      } = this.props
+      const { childProps, loaded } = this.state
+      return loaded
+        ? children(
+            childProps,
             /**
              * This actually solve the problem of passing context params
              * around.
              */
-            ...args
+            rest
           )
         : this.props.preload
-          ? this.props.preload()
-          : this.props.children(
-              this.props.defaultValue ||
-              this.props.initialState || // Some people may prefer initialState
-                {},
-              ...args
-            )
+          ? preload()
+          : children(initialState, rest)
     }
 
     componentDidUpdate(prevProps) {
