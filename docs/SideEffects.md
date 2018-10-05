@@ -9,7 +9,7 @@ const refetch = () => ajax.get('/todos')
 Actually, you don't have to reimplement such pure functions or lift them to RxJS space. For example, you have a component called `<TodoList />`. What you can do to avoid reimplementing all the logics is to lift the state up:
 
 ```jsx
-<TodoList todos={todos} onChange={onStateChange} />
+<TodoList todos={todos} onStateChange={onStateChange} />
 ```
 
 And wrap it inside a subscription:

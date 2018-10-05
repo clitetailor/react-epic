@@ -67,14 +67,26 @@ export class CounterComponent extends React.Component {
 Lift operator provide a way to lift a reducer like operator up into RxJS operator.
 
 ```jsx
+const reducer = (state, action) => state + action
+
+const liftedReducer = lift(reducer)
+liftedReducer(state$, action$)
+```
+
+Or you can lift an operator in Redux style:
+
+```jsx
 const reducer = (state = 0, action) => {
   switch (action) {
     case 'INCREMENT':
       return state + 1
+
     case 'DECREMENT':
       return state - 1
+
     case 'RESET':
       return 0
+
     default:
       return state
   }
@@ -84,8 +96,24 @@ const liftedReducer = lift(reducer)
 liftedReducer(state$, action$)
 ```
 
-It can be use for direct subscription from state source and action source also:
+It can also be used for direct subscription from state source and action source also:
 
 ```jsx
 lift(state$, action$, reducer).subscribe()
+```
+
+### combineEpics
+
+Combine epics into one root epic. Allow custom route for relationships between parts of the store:
+
+```jsx
+const counterEpic = ({ counter }) => {}
+const todoEpic = ({ todo }) => {}
+
+const shareEpic = ({ counterStore, todosStore }) => {}
+
+const rootEpic = combineEpics(
+  { counterStore: counterEpic, todosStore: todoEpic },
+  shareEpic
+)
 ```
