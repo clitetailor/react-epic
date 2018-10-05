@@ -77,7 +77,3 @@ source.pipe(
 However, the first case is still clean if we don't plan to store any state in the stream but still keep the stream flat.
 
 For a conclusion, I will say that even error handler can be failed and the line of handling error or is quite blurry sometimes. So make sure that you added an error handler and not overthinking how to handle the error!
-
-Next Chapter: [Common Mistakes](CommonMistakes.md)
-
-To top: [Table of Contents](Wiki.md)
