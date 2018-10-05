@@ -14,7 +14,7 @@ switchMap(state =>
 )
 ```
 
-The action may be repeated. It may not repeat due to the use of `switchMap` but there is no guaranteer that the action is not over updating and spamming the state. So to avoid this i embedded sync operator by default some ReactDOM functions. What the `sync` operator do is:
+The action may be repeated. It may not repeat due to the use of `switchMap` but there is no guaranteer that the action is not over updating and spamming the state. So the sync operator only do one thing: It cleans up previous emitted values so that it can not store actions by such using cold Subjects.
 
 ```jsx
 const subject = new Subject()
@@ -48,6 +48,4 @@ action$.next(6)
 action$.next(8)
 ```
 
-I planned to embed `sync` on `lift` function too but it seems to be inadequate because someone may want to update the state with a list of actions and it's not optimal to keep a lot closures just to optimize some intial emitted values. It only seems to suitable with DOM when you may want to buffered some states before being rendered. So you it with caution.
-
-Previous: [Throttling and Buffering](ThrottlingAndBuffering.md#SyncOperator)
+I have planned to embed `sync` into `lift` function once but it seems not to be adequate because someone may want to update the state with a list of actions and it's not optimal to keep a lot closures just to optimize some intial emitted values. It only seems to suitable with DOM when you may want to buffered some states before being rendered. So use it with a caution.

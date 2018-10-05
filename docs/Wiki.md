@@ -4,18 +4,30 @@ Welcome to React Epic Wiki! 💖
 
 ## Table of Contents
 
-- [Add React Epic to React Counter App](CounterExample.md)
+### Getting Started
+
+- [Add React Epic to React Counter App](CounterApp.md)
+- [Quick API Review](APIOverview.md)
 - [API Reference](APIReference.md)
   - [Components](APIReference.md#Components)
   - [Decorators](APIReference.md#Decorators)
   - [Functions](APIReference.md#Functions)
+- [Pure Logic and Side Effects](SideEffects.md)
 - [Handling Error](HandlingError.md)
 - [Common Mistakes](CommonMistakes.md)
+
+### Architecture
+
 - [Store and More on Dependency Injection](StoreAndDI.md)
-- [React Epic Breakdown Cookbook](BreakdownCookbook.md) [`experimental`]
-  - [Bridging between Redux and React Epic](BreakdownCookbook.md#ReduxBridging) [`advance technique`]
-- [Lift Behind the Scene](LiftBehindTheScene.md)
-- [Execution Context in RxJS](RxJSExecutionContext.md) [`advance technique`]
-- [Throttling And Buffering](ThrottlingAndBuffering.md) [`experimental`]
-  - [Sync Operator](SyncOperator.md) [`experimental`]
-- [Cascading Problem in React Epic](CascadingUpdate.md) [`experimental`]
+- [Bridging between Redux and React Epic](ReduxBindings.md)
+- [Lift Operator](LiftOperator.md)
+
+### Techniques
+
+- [Execution Context in RxJS](RxJSExecutionContext.md)
+- [Throttling And Buffering](ThrottlingAndBuffering.md) `experimental`
+  - [Sync Operator](SyncOperator.md) `experimental`
+
+### Advance
+
+- [Cascading Problem in React Epic](CascadingUpdate.md)

@@ -2,7 +2,7 @@
 
 ## Using merge the wrong way
 
-This is one of my bad nightmare with RxJS (which might cause even error handler to be failed on debugging):
+This is one of my worst nightmare with RxJS (which might cause error handler to even fail on debugging):
 
 ```jsx
 merge([stream1, stream2]) // Wrong
@@ -51,7 +51,3 @@ renderProps = (props) => {
   return /* ... */
 }
 ```
-
-Next: [About Store and Dependency Injection](StoreAndDI.md)
-
-To top: [Table of Contents](Wiki.md)
