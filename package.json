@@ -4,6 +4,7 @@
   "description": "Featured Subscriber and HOC for React Components",
   "main": "dist/react-epic.js",
   "scripts": {
+    "deploy": "node fuse deploy",
     "build": "node fuse build",
     "watch": "node fuse watch",
     "help": "node fuse help",
