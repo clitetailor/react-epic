@@ -153,7 +153,7 @@ function second(first) {
 }
 ```
 
-So that when the `first` is being called, the `second` can not be called again (recursive call for example) until the `first` release the resources. You know this might never happen in JS but this might happen in RxJS. For example, when you switch to a new tab, the context now is that new tab. But when open the modal, you want that every events on the tab need to be locked until the modal is closed. How do you stimulate that model?
+So that when the `first` is being called, the `second` can not be called again (recursive call for example) until the `first` release the resources. You know this might never happen in JS but this might happen in RxJS. For example, when you switch to a new tab, the context now is that new tab. But when open the modal, you want that every events on the tab need to be locked until the modal is closed. How do you simulate that model?
 
 The solution is to use `skipWhile` or `takeWhile` because it works the same way with `if`:
 

@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import { mount, shallow } from 'enzyme'
+import { noop } from 'rxjs'
 
 import { WithRx, Provider } from '../src/WithRx'
-import { noop } from '../src/noop'
 
 @WithRx(
   ({ counter }) => ({ counter }),
