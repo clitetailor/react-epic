@@ -8,6 +8,8 @@ Featured Subscriber and HOC for React & RxJS ✨🚀🤘👨‍🚀🐟🐠
 
 </div>
 
+[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/react-epic)
+
 ## Install
 
 You can install React Epic by either using PNPM, Yarn or NPM:
@@ -48,6 +50,8 @@ refetchTodos$.pipe(
 )
 export class Todos extends Component { ... }
 ```
+
+[![Edit react-epic-example-app](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/j710o084zv)
 
 This library was influenced largely by Dart StreamBuilder, Redux Observable and React Redux!
 
