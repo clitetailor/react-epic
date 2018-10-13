@@ -1,18 +1,18 @@
 {
   "name": "react-epic",
-  "version": "0.0.1",
+  "version": "0.0.2-0",
   "description": "Featured Subscriber and HOC for React Components",
   "main": "dist/react-epic.js",
   "files": [
     "dist"
   ],
   "scripts": {
-    "deploy": "node fuse deploy",
+    "deploy": "npm test && npm run build && npm publish",
     "build": "node fuse build",
     "watch": "node fuse watch",
     "help": "node fuse help",
     "test": "mocha test/**/*.test.js --opts mocha.opts",
-    "nyc": "nyc npm test"
+    "nyc": "npm run build && nyc npm test"
   },
   "keywords": [
     "rxjs",

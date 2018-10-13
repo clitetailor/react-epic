@@ -43,24 +43,6 @@ context(
   }
 )
 
-task('deploy', async context => {
-  const test = await spawnSync(
-    process.platform === 'win32' ? 'npm.cmd' : 'npm',
-    ['run', 'test'],
-    {
-      stdio: 'inherit',
-      encoding: 'utf-8'
-    }
-  )
-
-  if (test.error) throw test.error
-
-  if (test.status === 0) {
-    await exec('build')
-    await npmPublish({ path: 'dist' })
-  }
-})
-
 task('build', async context => {
   await exec('clean', 'build:node', 'build:umd')
 })
