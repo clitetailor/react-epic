@@ -12,7 +12,7 @@
     "watch": "node fuse watch",
     "help": "node fuse help",
     "test": "mocha test/**/*.test.js --opts mocha.opts",
-    "nyc": "nyc npm test"
+    "nyc": "npm run build && nyc npm test"
   },
   "keywords": [
     "rxjs",
