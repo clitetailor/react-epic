@@ -1,4 +1,4 @@
-# Execution Context in RxJS
+# Execution Context: Stream vs Function
 
 Sometimes when you try to implement a simple ajax method, you might find yourself in a situation. You don't know how to register the ajax call correctly or whether to register it locally or globally:
 
@@ -8,178 +8,138 @@ const refetchTodos = () => ajax.get('/todos')
 
 In this chapter, We will show you about the technique and how to use it efficently.
 
-## The Mechanism
+## The different between Stream and Function
 
-Before i show you how to apply the techique of Execution Context into RxJS. I will guild you to the mechanical of Execution Context using Function first. This is a small demonstration:
+In RxJS, we use stream so frequently that we always try to convert a function into a stream. But the main different between a Stream and a Function we may not really know. To illustrate the differences, we have a small example:
 
 ```jsx
-function first(input1, input2, input3, input4) {
-  // This is the execution context of the function first
+const subscription = combineLastest(input1$, input2$, input3).pipe(
+  /* Operators */
+).subscribe(output$)
+
+function (input1, input2, input3) {
+  /* Instructions */
+  return output
 }
 ```
 
-I will call it the first-order function. You might have an ideal, what if you can put a execution context into another execution context:
+So as we see, there are two main differences between a stream and a function:
 
-```jsx
-function second(input1, input2, input3, input4) {
-  // This is the execution context of the second function
-  return first(input1, input2, input3, input4) // Execute another context
-}
+- The sources and the targets of a stream are usually explicit. In constrast, the inputs and the outputs of a function are arbitrary.
+- A function is lazy, it only execute correctly if all its input informations have been filled in. Meanwhile, stream is reactive, only one of its sources need to be changed to trigger the stream change.
+
+It means that when a stream has already been declared, it's unlikely to change its input and output sources. But a function is different, it will be called once at a time on different inputs and different outputs.
+
+Another explanation is: The technique of RxJS is to execute a set of functions repeatly on different inputs and outputs. To do this, we need to lock the input and the output sources of a stream.
+
+In summary, function is lazy and stream is reactive. Depend on what we need that we decide to use stream or function.
+
+## The transition between Function and Stream
+
+A stream is not totaly reactive. I has to be lazy at some point. For example a subject only emit a value when someone call `next`. To illustrate here is the diagram:
+
+```text
+function ---> function --> subject.next --> operators --> subscribe -->   function
+\----------v---------/     \               \----v----/            /     \----v-----/
+   function context         \           function context         /    function context
+                             \------------------v---------------/
+                                          stream context
 ```
 
-So how Function and RxJS can be similar to each other. Here is an example of how a function declaration looks like in RxJS:
+## Convert a Function to RxJS style
+
+There're two thing we have to notice about a function. One is its declaration. The second is how to call it.
 
 ```jsx
-combineLastest(input1$, input2$, input3$, input4$)
-  .pipe(...instructions)
+// Function declaration
+function myFunction(input1, input2, input3, input4) {
+  /* Instructions */
+  return output
+}
+
+// Function call
+const var5 = myFunction(var1, var2, var3, var4)
+```
+
+It's the same method works with stream. For a stream, We will also need a stream declaration and a way to trigger that stream runs.
+
+```jsx
+// Stream declaration
+input1$
+  .pipe(
+    switchMap(input1 =>
+      input2$.pipe(map(operator.bind(null.input1)))
+    )
+  )
   .subscribe(output$)
+
+// Trigger stream runs
+input1$.next(var1)
+input2$.next(var2)
 ```
 
-But the way we make a function call is quite different. The function is called whenever one of its input is dispatched:
+## Nested Function Call / Nested Stream Triggering / Nest Stream Function Call
+
+One of the most powerful feature is higher-order-function. With higher-order-function, we can perform much more higher level of logic.
 
 ```jsx
-input1$.next(value1)
-input2$.next(value2)
-```
-
-And the way they return is different too:
-
-```jsx
-subscribe(output$)
-
-subscribe(ouput => {
-  /* ... */
-})
-```
-
-One more thing you may need to know is how to make a nesting function call. First, you need to pass a function into another function:
-
-```jsx
-// Function style
-second(first)
-
-// RxJS style
-second$.next(first$)
-```
-
-And then we run it by calling it inside its wrapper:
-
-```jsx
-// Function style
-function second(first) {
-  first()
+function higherFunction(someFunction) {
+  return someFunction()
 }
+```
 
-// RxJS style
-second$.subscribe(first$ => {
-  first$.next()
+In RxJS, we can do the same thing with Subject:
+
+```jsx
+const register$ = new Subject()
+register$.subscribe(action$ => action$.next())
+
+register$.next(action1$)
+```
+
+We can also have mix the benefit of both function and stream together:
+
+```jsx
+const register$ = new Subject()
+register$.pipe(throttle(1000)).subscribe(someFunction => {
+  output$.next(someFunction())
 })
+
+register$.next(action)
 ```
 
 ## Examples
 
-One of the most important thing you need to know is how to apply Execution Context technique into your situation and how to do that. So in the first problem, it's very easy if you want to register the function locally:
+Now, its time to answer each question, one by one. The first question: how to register the ajax call:
 
 ```jsx
-// Function declaration
-first$.pipe(mergeMap(() => ajax.get('/api'))).subscribe(state$)
+const fetchApi = api => ajax.get(api)
 
-// Second is to make a function call
-first$.next(value)
-```
+const todos$ = new BehaviorSubject([])
+const refetchTodos$ = new Subject()
 
-So how do we register it globally. To describe the use case, here is a problem for example. If you want that every ajax call need to be throttled for 5 seconds before you can make a new ajax. You may do something like this:
-
-```jsx
-let processQueue = []
-
-function registerAjaxCall(ajax) {
-  processQueue.push(ajax)
-}
-
-setInterval(() => {
-  if (processQueue.length) {
-    processQueue.shift()()
-  }
-}, 5000)
-
-function getApi() {
-  ajax.get('/api').then(output => {
-    /* ... */
-  })
-}
-
-registerAjaxCall(getApi)
-```
-
-The same thing will work with RxJS:
-
-```jsx
-let queue = new Subject()
-queue.pipe(throttle(5000)).subscribe(output => output.next())
-
-let getApi = new Subject()
-getApi
-  .pipe(mergeMap(() => ajax.get('/api')))
-  .subscribe(output => {
-    /* ... */
-  })
-
-queue.next(getApi)
-```
-
-That is much more simpler!
-
-## The different between Function and RxJS
-
-The different between Function and RxJS is that with a Function, you can call it anywhere you need and anytime you want. If you don't need it, you can just call another function. With RxJS, you call it once on event streams but it will run all the time. The pros is that you only need to trigger changes on one event source and the effect of the function will be rerun throughout the whole app. The cons is that you are now unlikely to change thing in imperative way but to write in a more declarative way.
-
-## Resource Coordination
-
-The above example is just one technique to lock down on resource. There's another example i can show you:
-
-```jsx
-function second(first) {
-  static lock = false
-  if (lock === false) {
-    lock = true
-    first()
-    lock = false
-  } else {
-    return
-  }
-
-  // Perform alternative tasks
-}
-```
-
-So that when the `first` is being called, the `second` can not be called again (recursive call for example) until the `first` release the resources. You know this might never happen in JS but this might happen in RxJS. For example, when you switch to a new tab, the context now is that new tab. But when open the modal, you want that every events on the tab need to be locked until the modal is closed. How do you stimulate that model?
-
-The solution is to use `skipWhile` or `takeWhile` because it works the same way with `if`:
-
-```jsx
-let lock = false
-
-second.pipe(skipWhile(() => lock)).subscribe(first => {
-  lock = true
-  first.next()
-  lock = false
-})
-```
-
-For the modal example, your implementation can be more specific:
-
-```jsx
-const lock = merge(
-  openModal.pipe(mapTo(true)),
-  closeModal.pipe(mapTo(false))
-)
-
-lock
+refetchTodos$
   .pipe(
-    switchMap(_lock => tabEvent.pipe(skipWhile(() => _lock)))
+    throttle(1000),
+    switchMap(() => fetchApi('/todo'))
   )
-  .subscribe(_tabEvent => {
-    /* ... */
-  })
+  .subscribe(todos$)
+```
+
+What if we want some enhancements. For example, any ajax call need to be throttle 1s before it's called:
+
+```jsx
+const fetchApi = api => ajax.get(api)
+
+const todos$ = new BehaviorSubject([])
+const refetchTodos$ = new Subject()
+refetchTodos.subscribe(todos$)
+
+const refetchAccount$ = new Subject()
+
+const register$ = new Subject()
+register$.pipe(throttle(1000)).subscribe(action => action())
+
+register$.next(refetchTodos$.next.bind(refetchTodos$))
+register$.next(refetchAccount$.next.bind(refetchAccount$))
 ```

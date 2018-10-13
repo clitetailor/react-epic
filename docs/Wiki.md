@@ -24,10 +24,8 @@ Welcome to React Epic Wiki! 💖
 
 ### Techniques
 
-- [Execution Context in RxJS](ExecutionContext.md) `experimental`
-- [Stream in RxJS Subject](Stream.md) `experimental`
-- [Throttling And Buffering](ThrottlingAndBuffering.md) `experimental`
-  - [Sync Operator](SyncOperator.md) `experimental`
+- [Execution Context: Stream vs Function](ExecutionContext.md) `experimental`
+- [Convert a Stream into a Subject](ConvertStream.md) `experimental`
 
 ### Advance
 
