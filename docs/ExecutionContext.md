@@ -110,7 +110,23 @@ register$.next(action)
 
 ## Examples
 
-Now, its time to answer each question, one by one. The first question: how to register the ajax call:
+The first example, we will recap the way we make an ajax call. Using function only, here is what we got:
+
+```jsx
+const todos = []
+
+// Function declaration
+refetchTodo() {
+  fetch('/todos').then(newTodos => {
+    todos = newTodos
+  })
+}
+
+// Function call
+refetchTodo()
+```
+
+Translate it to RxJS, then we got:
 
 ```jsx
 const fetchApi = api => ajax.get(api)
@@ -118,28 +134,107 @@ const fetchApi = api => ajax.get(api)
 const todos$ = new BehaviorSubject([])
 const refetchTodos$ = new Subject()
 
+// Declaring the stream
 refetchTodos$
   .pipe(
     throttle(1000),
     switchMap(() => fetchApi('/todo'))
   )
   .subscribe(todos$)
+
+// Trigger stream runs
+refetchTodos$.next()
 ```
 
-What if we want some enhancements. For example, any ajax call need to be throttle 1s before it's called:
+The second example is about process queue. Imagine here is how our process queue works:
 
 ```jsx
-const fetchApi = api => ajax.get(api)
+const queue = []
+let timeout = null
 
-const todos$ = new BehaviorSubject([])
-const refetchTodos$ = new Subject()
-refetchTodos.subscribe(todos$)
+// Function declarations
+function processQueue() {
+  if (!timeout && queue.length) {
+    queue.shift()() // Nested function call
 
-const refetchAccount$ = new Subject()
+    timeout = setTimeout(() => {
+      timeout = null
+      processQueue()
+    }, 1000)
+  }
+}
 
+function queuePush(func) {
+  queue.push(func)
+  processQueue()
+}
+
+function register(func) {
+  queuePush(func)
+}
+
+// Function calls
+register(fetchTodos)
+register(processTodos)
+register(addTodo)
+```
+
+```jsx
+// Stream declaration
 const register$ = new Subject()
-register$.pipe(throttle(1000)).subscribe(action => action())
+register$.pipe(throttle(1000)).subscribe(stream => {
+  stream.next() // Nested stream trigger
+})
 
-register$.next(refetchTodos$.next.bind(refetchTodos$))
-register$.next(refetchAccount$.next.bind(refetchAccount$))
+// Trigger stream runs
+register$.next(refetchTodos$)
+register$.next(processTodos$)
+register$.next(addTodo$)
+```
+
+The third example is quite tricky. The third example is about how to lock some background tasks when some modal is being shown:
+
+```jsx
+let lock = false
+
+// Function declarations
+function performBackgroundTask(task) {
+  if (!lock) {
+    task()
+  }
+}
+
+function openModal() {
+  lock = true
+}
+
+function closeModal() {
+  lock = false
+}
+
+openModal()
+performBackgroundTask(playVideo)
+```
+
+Here is how we define it in RxJS:
+
+```jsx
+const lock$ = merge(
+  of(false),
+  openModal$.pipe(mapTo(true)),
+  closeModal$.pipe(mapTo(false))
+)
+
+const backgroundTask$ = new Subject()
+
+lock$
+  .pipe(
+    switchMap(lock =>
+      backgroundTask$.pipe(takeWhile(() => !lock))
+    )
+  )
+  .subscribe(task => task())
+
+openModal$.next()
+backgroundTask$.next(playVideo)
 ```

@@ -53,4 +53,4 @@ This library was influenced largely by Dart StreamBuilder, Redux Observable and 
 
 ## Documentation
 
-For more information about documentation and FAQ, please visit [our friendly Wiki](/docs/Wiki.md)!
+For more information about documentation and FAQ, please visit [our friendly Wiki](/docs/README.md)!
