@@ -1,7 +1,6 @@
-import { isObservable } from 'rxjs'
+import { isObservable, noop } from 'rxjs'
 
 import { isFunction } from './isFunction'
-import { noop } from './noop'
 
 export function bindActions(actions, ...args) {
   const keys = Object.keys(actions)

@@ -8,7 +8,7 @@ import { lift } from '../src/lift'
 import { createMountPoint } from './CounterApp'
 import { WithRx, Provider } from '../src/WithRx'
 
-import * as sinon from 'sinon'
+import sinon from 'sinon'
 
 describe('WithRx', () => {
   describe('CounterApp', () => {

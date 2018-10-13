@@ -136,14 +136,14 @@ export function WithRx(
             initialState={defaultValue || initialState}
             preload={preload}
             observer={bindState(mapStateToProps(context))}
-            args={[context]}
+            context={context}
           >
             {this.renderObserver}
           </Subscribe>
         )
       }
 
-      renderObserver = (storeState, context) => {
+      renderObserver = (storeState, { context }) => {
         return (
           <WrappedComponent
             {...mergeProps(
