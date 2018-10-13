@@ -7,7 +7,7 @@
     "dist"
   ],
   "scripts": {
-    "deploy": "node fuse deploy",
+    "deploy": "npm test && npm run build && npm publish",
     "build": "node fuse build",
     "watch": "node fuse watch",
     "help": "node fuse help",
