@@ -1,6 +1,6 @@
 {
   "name": "react-epic",
-  "version": "0.0.1",
+  "version": "0.0.2-0",
   "description": "Featured Subscriber and HOC for React Components",
   "main": "dist/react-epic.js",
   "files": [
