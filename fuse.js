@@ -44,10 +44,16 @@ context(
 )
 
 task('deploy', async context => {
-  const test = await spawnSync('npm.cmd', ['run', 'test'], {
-    stdio: 'inherit',
-    encoding: 'utf-8'
-  })
+  const test = await spawnSync(
+    process.platform === 'win32' ? 'npm.cmd' : 'npm',
+    ['run', 'test'],
+    {
+      stdio: 'inherit',
+      encoding: 'utf-8'
+    }
+  )
+
+  if (test.error) throw test.error
 
   if (test.status === 0) {
     await exec('build')
