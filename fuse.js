@@ -12,7 +12,7 @@ const {
   bumpVersion,
   npmPublish
 } = require('fuse-box/sparky')
-const { spawnSync } = require('child_process');
+const { spawnSync } = require('child_process')
 
 context(
   class FuseContext {
@@ -44,20 +44,22 @@ context(
 )
 
 task('deploy', async context => {
-  console.log('Executing mocha tests');
-  const test = spawnSync('npm', ['run', 'test'], {
-    stdio: 'inherit',
-    encoding: 'utf-8',
-  });
+  const test = await spawnSync(
+    process.platform === 'win32' ? 'npm.cmd' : 'npm',
+    ['run', 'test'],
+    {
+      stdio: 'inherit',
+      encoding: 'utf-8'
+    }
+  )
+
+  if (test.error) throw test.error
 
   if (test.status === 0) {
-    console.log('Publishing new package');
-    await exec('build');
-    await npmPublish({path: 'dist'});
-  } else {
-    console.log('Not publishing new package');
+    await exec('build')
+    await npmPublish({ path: 'dist' })
   }
-});
+})
 
 task('build', async context => {
   await exec('clean', 'build:node', 'build:umd')

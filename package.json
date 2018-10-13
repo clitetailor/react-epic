@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "Featured Subscriber and HOC for React Components",
   "main": "dist/react-epic.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "deploy": "node fuse deploy",
     "build": "node fuse build",
@@ -40,6 +43,7 @@
     "enzyme": "^3.6.0",
     "enzyme-adapter-react-16": "^1.5.0",
     "fuse-box": "^3.5.0",
+    "history": "^4.7.2",
     "jsdom": "^12.1.0",
     "mocha": "^5.2.0",
     "nyc": "^13.0.1",
